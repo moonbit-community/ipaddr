@@ -1,5 +1,5 @@
 {
   "import": [
-    "username/ipaddr/lib"
+    "bobzhang/ipaddr/lib"
   ]
 }
