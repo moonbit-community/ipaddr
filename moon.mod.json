@@ -2,7 +2,7 @@
   "name": "bobzhang/ipaddr",
   "version": "0.1.0",
   "readme": "README.md",
-  "repository": "",
+  "repository": "https://github.com/bobzhang/ipaddr",
   "license": "ISC",
   "keywords": ["ip", "ipv4", "ipv6", "mac", "address", "network", "cidr"],
   "description": "A library for manipulation of IP (IPv4/IPv6) and MAC address representations",
