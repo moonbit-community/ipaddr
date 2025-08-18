@@ -17,20 +17,16 @@ A MoonBit library for manipulation of IP (IPv4/IPv6) and MAC address representat
 
 ```moonbit
 // IPv4 addresses
-let addr = @lib.parse_ipv4("192.168.1.1")
-let formatted = @lib.format_ipv4(addr)
+let addr = ipv4(192, 168, 1, 1)
+let formatted = format_ipv4(addr)
 
-// IPv6 addresses  
-let addr6 = @lib.parse_ipv6("2001:db8::1")
-let formatted6 = @lib.format_ipv6(addr6)
-
-// CIDR prefixes
-let prefix = @lib.parse_ipv4_prefix("192.168.1.0/24")
-let contains = @lib.ipv4_prefix_contains(prefix, addr)
+// IPv4 CIDR prefixes
+let prefix = ipv4_prefix(ipv4(192, 168, 1, 0), 24)
+let contains = ipv4_prefix_contains(prefix, addr)
 
 // MAC addresses
-let mac = @lib.parse_mac("00:11:22:33:44:55")
-let formatted_mac = @lib.format_mac(mac)
+let mac_addr = mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
+let formatted_mac = format_mac(mac_addr)
 ```
 
 ## License
