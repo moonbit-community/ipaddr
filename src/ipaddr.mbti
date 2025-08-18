@@ -1,0 +1,89 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "bobzhang/ipaddr"
+
+// Values
+fn format_ipv4(Ipv4) -> String
+
+fn format_mac(Mac) -> String
+
+fn int_to_ipv4(Int) -> Ipv4
+
+fn int_to_mac(Int) -> Mac
+
+fn ipv4(Int, Int, Int, Int) -> Ipv4
+
+fn ipv4_is_broadcast(Ipv4) -> Bool
+
+fn ipv4_is_loopback(Ipv4) -> Bool
+
+fn ipv4_is_multicast(Ipv4) -> Bool
+
+fn ipv4_is_private(Ipv4) -> Bool
+
+fn ipv4_prefix(Ipv4, Int) -> Ipv4Prefix
+
+fn ipv4_prefix_broadcast(Ipv4Prefix) -> Ipv4
+
+fn ipv4_prefix_contains(Ipv4Prefix, Ipv4) -> Bool
+
+fn ipv4_prefix_network(Ipv4Prefix) -> Ipv4
+
+fn ipv4_to_int(Ipv4) -> Int
+
+fn is_valid_ipv4(Ipv4) -> Bool
+
+fn is_valid_ipv4_octet(Int) -> Bool
+
+fn mac(Int, Int, Int, Int, Int, Int) -> Mac
+
+fn mac_is_broadcast(Mac) -> Bool
+
+fn mac_is_global(Mac) -> Bool
+
+fn mac_is_local(Mac) -> Bool
+
+fn mac_is_multicast(Mac) -> Bool
+
+fn mac_is_unicast(Mac) -> Bool
+
+fn mac_oui(Mac) -> (Int, Int, Int)
+
+fn mac_to_int(Mac) -> Int
+
+// Errors
+
+// Types and methods
+pub struct Ipv4 {
+  a : Int
+  b : Int
+  c : Int
+  d : Int
+}
+impl Compare for Ipv4
+impl Eq for Ipv4
+impl Show for Ipv4
+
+pub struct Ipv4Prefix {
+  addr : Ipv4
+  prefix_len : Int
+}
+impl Compare for Ipv4Prefix
+impl Eq for Ipv4Prefix
+impl Show for Ipv4Prefix
+
+pub struct Mac {
+  b0 : Int
+  b1 : Int
+  b2 : Int
+  b3 : Int
+  b4 : Int
+  b5 : Int
+}
+impl Compare for Mac
+impl Eq for Mac
+impl Show for Mac
+
+// Type aliases
+
+// Traits
+
