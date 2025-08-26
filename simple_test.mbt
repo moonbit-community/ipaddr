@@ -293,3 +293,143 @@ test "oo_style_constructors" {
     fail("Mac::new should produce same result as mac")
   }
 }
+
+///|
+test "ipv4_parsing" {
+  // Test valid parsing
+  match @ipaddr.Ipv4::parse("192.168.1.1") {
+    Some(addr) => {
+      if addr.format() != "192.168.1.1" {
+        fail("Parsed address should format correctly")
+      }
+    }
+    None => fail("Valid IPv4 string should parse successfully")
+  }
+
+  // Test localhost
+  match @ipaddr.Ipv4::parse("127.0.0.1") {
+    Some(addr) => {
+      if not(addr.is_loopback()) {
+        fail("127.0.0.1 should be loopback")
+      }
+    }
+    None => fail("127.0.0.1 should parse successfully")
+  }
+
+  // Test invalid cases
+  if @ipaddr.Ipv4::parse("256.1.1.1") != None {
+    fail("Out of range octet should return None")
+  }
+  if @ipaddr.Ipv4::parse("192.168.1") != None {
+    fail("Incomplete address should return None")
+  }
+  if @ipaddr.Ipv4::parse("192.168.1.1.1") != None {
+    fail("Too many octets should return None")
+  }
+  if @ipaddr.Ipv4::parse("192.168.01.1") != None {
+    fail("Leading zeros should return None")
+  }
+  if @ipaddr.Ipv4::parse("192.168.a.1") != None {
+    fail("Non-numeric octet should return None")
+  }
+  if @ipaddr.Ipv4::parse("") != None {
+    fail("Empty string should return None")
+  }
+}
+
+///|
+test "mac_parsing" {
+  // Test valid parsing with colon separator
+  match @ipaddr.Mac::parse("00:11:22:33:44:55") {
+    Some(mac) => {
+      if mac.format() != "00:11:22:33:44:55" {
+        fail("Parsed MAC should format correctly")
+      }
+    }
+    None => fail("Valid MAC string should parse successfully")
+  }
+
+  // Test valid parsing with dash separator
+  match @ipaddr.Mac::parse("FF-FF-FF-FF-FF-FF") {
+    Some(mac) => {
+      if not(mac.is_broadcast()) {
+        fail("FF-FF-FF-FF-FF-FF should be broadcast")
+      }
+    }
+    None => fail("Valid MAC string with dashes should parse successfully")
+  }
+
+  // Test invalid cases
+  if @ipaddr.Mac::parse("invalid") != None {
+    fail("Invalid format should return None")
+  }
+  if @ipaddr.Mac::parse("00:11:22:33:44") != None {
+    fail("Incomplete MAC should return None")
+  }
+  if @ipaddr.Mac::parse("00:11:22:33:44:55:66") != None {
+    fail("Too many bytes should return None")
+  }
+  if @ipaddr.Mac::parse("00:GG:22:33:44:55") != None {
+    fail("Invalid hex digit should return None")
+  }
+  if @ipaddr.Mac::parse("0:11:22:33:44:55") != None {
+    fail("Single hex digit should return None")
+  }
+}
+
+///|
+test "ipv4_prefix_parsing" {
+  // Test valid parsing
+  match @ipaddr.Ipv4Prefix::parse("192.168.1.0/24") {
+    Some(prefix) => {
+      let test_addr = @ipaddr.ipv4(192, 168, 1, 100)
+      if not(prefix.contains(test_addr)) {
+        fail("192.168.1.100 should be in 192.168.1.0/24")
+      }
+    }
+    None => fail("Valid CIDR string should parse successfully")
+  }
+
+  // Test /0 prefix (default route)
+  match @ipaddr.Ipv4Prefix::parse("0.0.0.0/0") {
+    Some(prefix) => {
+      let any_addr = @ipaddr.ipv4(8, 8, 8, 8)
+      if not(prefix.contains(any_addr)) {
+        fail("0.0.0.0/0 should contain any address")
+      }
+    }
+    None => fail("Default route should parse successfully")
+  }
+
+  // Test /32 host route
+  match @ipaddr.Ipv4Prefix::parse("127.0.0.1/32") {
+    Some(prefix) => {
+      let localhost = @ipaddr.ipv4(127, 0, 0, 1)
+      let other = @ipaddr.ipv4(127, 0, 0, 2)
+      if not(prefix.contains(localhost)) {
+        fail("127.0.0.1/32 should contain 127.0.0.1")
+      }
+      if prefix.contains(other) {
+        fail("127.0.0.1/32 should not contain 127.0.0.2")
+      }
+    }
+    None => fail("Host route should parse successfully")
+  }
+
+  // Test invalid cases
+  if @ipaddr.Ipv4Prefix::parse("invalid") != None {
+    fail("Invalid format should return None")
+  }
+  if @ipaddr.Ipv4Prefix::parse("192.168.1.0") != None {
+    fail("Missing prefix length should return None")
+  }
+  if @ipaddr.Ipv4Prefix::parse("192.168.1.0/33") != None {
+    fail("Invalid prefix length should return None")
+  }
+  if @ipaddr.Ipv4Prefix::parse("256.1.1.1/24") != None {
+    fail("Invalid IP address should return None")
+  }
+  if @ipaddr.Ipv4Prefix::parse("192.168.1.0/08") != None {
+    fail("Leading zero in prefix should return None")
+  }
+}

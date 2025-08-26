@@ -58,6 +58,66 @@ pub fn Ipv4::new(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
   { a, b, c, d }
 }
 
+/// Parses an IPv4 address from a dotted decimal string.
+///
+/// # Parameters
+/// - `s`: A string in the format "a.b.c.d" where each component is 0-255
+///
+/// # Returns
+/// `Some(Ipv4)` if parsing succeeds, `None` if the format is invalid
+///
+/// # Examples
+/// ```moonbit
+/// let _ = @ipaddr.Ipv4::parse("192.168.1.1")
+/// let _ = @ipaddr.Ipv4::parse("127.0.0.1")
+/// let _ = @ipaddr.Ipv4::parse("256.1.1.1") // None - out of range
+/// let _ = @ipaddr.Ipv4::parse("192.168.1") // None - wrong format
+/// ```
+///
+fn parse_octet(s : String) -> Option[Byte] {
+  if s.length() == 0 || s.length() > 3 {
+    return None
+  }
+  
+  let mut result = 0
+  let mut i = 0
+  while i < s.length() {
+    let c = s[i]
+    if c < '0' || c > '9' {
+      return None
+    }
+    result = result * 10 + (c - 48)
+    if result > 255 {
+      return None
+    }
+    i = i + 1
+  }
+  
+  // Don't allow leading zeros (except for "0")
+  if s.length() > 1 && s[0] == '0' {
+    return None
+  }
+  
+  Some(result.to_byte())
+}
+
+pub fn Ipv4::parse(s : String) -> Option[Ipv4] {
+  let parts = s.split(".").collect()
+  if parts.length() != 4 {
+    return None
+  }
+  
+  let octets : Array[Byte] = []
+  for i = 0; i < 4; i = i + 1 {
+    match parse_octet(parts[i].to_string()) {
+      Some(n) => octets.push(n)
+      None => return None
+    }
+  }
+  
+  Some(ipv4(octets[0], octets[1], octets[2], octets[3]))
+}
+
 ///|
 /// Formats the IPv4 address as a dotted decimal string.
 ///
@@ -364,6 +424,69 @@ pub fn Ipv4Prefix::new(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
   { addr, prefix_len }
 }
 
+/// Parses an IPv4 CIDR prefix from a string.
+///
+/// # Parameters
+/// - `s`: A string in the format "a.b.c.d/n" where a.b.c.d is an IPv4 address and n is the prefix length (0-32)
+///
+/// # Returns
+/// `Some(Ipv4Prefix)` if parsing succeeds, `None` if the format is invalid
+///
+/// # Examples
+/// ```moonbit
+/// let _ = @ipaddr.Ipv4Prefix::parse("192.168.1.0/24")
+/// let _ = @ipaddr.Ipv4Prefix::parse("10.0.0.0/8")
+/// let _ = @ipaddr.Ipv4Prefix::parse("invalid") // None - wrong format
+/// ```
+///
+pub fn Ipv4Prefix::parse(s : String) -> Option[Ipv4Prefix] {
+  let parts = s.split("/").collect()
+  if parts.length() != 2 {
+    return None
+  }
+  
+  // Parse the IPv4 address part
+  let addr = match Ipv4::parse(parts[0].to_string()) {
+    Some(a) => a
+    None => return None
+  }
+  
+  // Parse the prefix length part
+  let prefix_len = match parse_prefix_len(parts[1].to_string()) {
+    Some(n) => n
+    None => return None
+  }
+  
+  Some(ipv4_prefix(addr, prefix_len))
+}
+
+fn parse_prefix_len(s : String) -> Option[Int] {
+  if s.length() == 0 || s.length() > 2 {
+    return None
+  }
+  
+  let mut result = 0
+  let mut i = 0
+  while i < s.length() {
+    let c = s[i]
+    if c < '0' || c > '9' {
+      return None
+    }
+    result = result * 10 + (c - 48)
+    if result > 32 {
+      return None
+    }
+    i = i + 1
+  }
+  
+  // Don't allow leading zeros (except for single "0")
+  if s.length() > 1 && s[0] == '0' {
+    return None
+  }
+  
+  Some(result)
+}
+
 ///|
 /// Checks if an IPv4 address is contained within this CIDR prefix/subnet.
 ///
@@ -542,6 +665,71 @@ pub fn mac(b0 : Int, b1 : Int, b2 : Int, b3 : Int, b4 : Int, b5 : Int) -> Mac {
 ///
 pub fn Mac::new(b0 : Int, b1 : Int, b2 : Int, b3 : Int, b4 : Int, b5 : Int) -> Mac {
   { b0, b1, b2, b3, b4, b5 }
+}
+
+/// Parses a MAC address from a hexadecimal string.
+///
+/// # Parameters
+/// - `s`: A string in the format "xx:xx:xx:xx:xx:xx" or "xx-xx-xx-xx-xx-xx" where each xx is a hexadecimal byte
+///
+/// # Returns
+/// `Some(Mac)` if parsing succeeds, `None` if the format is invalid
+///
+/// # Examples
+/// ```moonbit
+/// let _ = @ipaddr.Mac::parse("00:11:22:33:44:55")
+/// let _ = @ipaddr.Mac::parse("FF-FF-FF-FF-FF-FF")
+/// let _ = @ipaddr.Mac::parse("invalid") // None - wrong format
+/// ```
+///
+pub fn Mac::parse(s : String) -> Option[Mac] {
+  // Try colon separator first, then dash
+  let parts = if s.contains(":") {
+    s.split(":").collect()
+  } else if s.contains("-") {
+    s.split("-").collect()
+  } else {
+    return None
+  }
+  
+  if parts.length() != 6 {
+    return None
+  }
+  
+  let bytes : Array[Int] = []
+  for i = 0; i < 6; i = i + 1 {
+    match parse_hex_byte(parts[i].to_string()) {
+      Some(n) => bytes.push(n)
+      None => return None
+    }
+  }
+  
+  Some(mac(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5]))
+}
+
+fn parse_hex_byte(s : String) -> Option[Int] {
+  if s.length() != 2 {
+    return None
+  }
+  
+  let mut result = 0
+  let mut i = 0
+  while i < 2 {
+    let c = s[i]
+    let digit = if c >= '0' && c <= '9' {
+      c - 48  // '0' = 48
+    } else if c >= 'a' && c <= 'f' {
+      c - 87  // 'a' = 97, so 'a' - 87 = 10
+    } else if c >= 'A' && c <= 'F' {
+      c - 55  // 'A' = 65, so 'A' - 55 = 10
+    } else {
+      return None
+    }
+    result = result * 16 + digit
+    i = i + 1
+  }
+  
+  Some(result)
 }
 
 ///|

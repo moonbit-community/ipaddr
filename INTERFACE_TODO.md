@@ -4,10 +4,10 @@
 - [x] **Consolidate constructors into associated `new` functions**
   - Replace global `ipv4`, `ipv4_prefix`, and `mac` with `Ipv4::new`, `Ipv4Prefix::new`, and `Mac::new` to align with OO style.
 
-- [ ] **Provide parsing from string helpers**
-  - Add `Ipv4::parse(String) -> Result<Ipv4>`
-  - Add `Ipv4Prefix::parse(String) -> Result<Ipv4Prefix>` (supports "192.168.1.0/24" syntax)
-  - Add `Mac::parse(String) -> Result<Mac>`
+- [x] **Provide parsing from string helpers**
+  - Add `Ipv4::parse(String) -> Option<Ipv4>`
+  - Add `Ipv4Prefix::parse(String) -> Option<Ipv4Prefix>` (supports "192.168.1.0/24" syntax)
+  - Add `Mac::parse(String) -> Option<Mac>`
 
 - [ ] **Expose `to_string` methods via `Show` trait only**
   - Evaluate whether explicit `format` methods are redundant given `Show` trait; consider deprecating `format`.
