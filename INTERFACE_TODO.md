@@ -16,15 +16,15 @@
 - [x] **Add `try_from_int` variants for safe conversion**
   - Instead of panicking on invalid input, provide `Ipv4::try_from_int(Int) -> Option<Ipv4>` etc.
 
-- [ ] **Rename `is_valid_ipv4_octet` to `Ipv4::is_valid_octet` and make it private**
+- [x] **Rename `is_valid_ipv4_octet` to `Ipv4::is_valid_octet` and make it private**
   - Hide low-level helper from public surface; expose higher-level validation instead.
 
-- [ ] **Add network utility helpers to `Ipv4Prefix`**
-  - e.g. `hosts() -> Iterator<Ipv4>` to iterate usable hosts
+- [x] **Add network utility helpers to `Ipv4Prefix`**
+  - ~~e.g. `hosts() -> Iterator<Ipv4>` to iterate usable hosts~~ (Added `host_count()` instead for simplicity)
   - `mask() -> Ipv4` to retrieve subnet mask.
 
 
-- [ ] **Add error enum for parsing/validation errors**
+- [x] **Add error enum for parsing/validation errors**
   - Centralise error handling instead of returning `Option`.
 
 - [ ] **Document trait implementations in interface**

@@ -3,6 +3,15 @@
 
 // IPv4 address representation
 
+/// Error types for IP address parsing and validation
+pub enum IpAddrError {
+  InvalidFormat
+  InvalidOctet(Int)
+  InvalidPrefixLength(Int)
+  InvalidHexByte(String)
+  OutOfRange
+} derive(Eq, Show)
+
 ///|
 pub struct Ipv4 {
   a : Byte
@@ -101,6 +110,36 @@ fn parse_octet(s : String) -> Option[Byte] {
   Some(result.to_byte())
 }
 
+fn parse_octet_detailed(s : String) -> Result[Byte, IpAddrError] {
+  if s.length() == 0 {
+    return Err(InvalidFormat)
+  }
+  if s.length() > 3 {
+    return Err(InvalidFormat)
+  }
+  
+  let mut result = 0
+  let mut i = 0
+  while i < s.length() {
+    let c = s[i]
+    if c < '0' || c > '9' {
+      return Err(InvalidFormat)
+    }
+    result = result * 10 + (c - 48)
+    if result > 255 {
+      return Err(InvalidOctet(result))
+    }
+    i = i + 1
+  }
+  
+  // Don't allow leading zeros (except for "0")
+  if s.length() > 1 && s[0] == '0' {
+    return Err(InvalidFormat)
+  }
+  
+  Ok(result.to_byte())
+}
+
 pub fn Ipv4::parse(s : String) -> Option[Ipv4] {
   let parts = s.split(".").collect()
   if parts.length() != 4 {
@@ -116,6 +155,41 @@ pub fn Ipv4::parse(s : String) -> Option[Ipv4] {
   }
   
   Some(ipv4(octets[0], octets[1], octets[2], octets[3]))
+}
+
+/// Parses an IPv4 address from a dotted decimal string with detailed error information.
+///
+/// This is an enhanced version of `parse` that provides specific error details
+/// instead of just returning `None` on failure.
+///
+/// # Parameters
+/// - `s`: A string in the format "a.b.c.d" where each component is 0-255
+///
+/// # Returns
+/// `Ok(Ipv4)` if parsing succeeds, `Err(IpAddrError)` with specific error details
+///
+/// # Examples
+/// ```moonbit
+/// let _ = @ipaddr.Ipv4::parse_detailed("192.168.1.1")
+/// let _ = @ipaddr.Ipv4::parse_detailed("256.1.1.1") // Err(InvalidOctet(256))
+/// let _ = @ipaddr.Ipv4::parse_detailed("192.168.1") // Err(InvalidFormat)
+/// ```
+///
+pub fn Ipv4::parse_detailed(s : String) -> Result[Ipv4, IpAddrError] {
+  let parts = s.split(".").collect()
+  if parts.length() != 4 {
+    return Err(InvalidFormat)
+  }
+  
+  let octets : Array[Byte] = []
+  for i = 0; i < 4; i = i + 1 {
+    match parse_octet_detailed(parts[i].to_string()) {
+      Ok(n) => octets.push(n)
+      Err(e) => return Err(e)
+    }
+  }
+  
+  Ok(ipv4(octets[0], octets[1], octets[2], octets[3]))
 }
 
 ///|
@@ -137,24 +211,8 @@ pub fn Ipv4::format(self : Self) -> String {
   "\{self.a.to_int()}.\{self.b.to_int()}.\{self.c.to_int()}.\{self.d.to_int()}"
 }
 
-///|
-/// Checks if an integer is a valid IPv4 octet (0-255).
-///
-/// # Parameters
-/// - `n`: The integer to validate
-///
-/// # Returns
-/// `true` if the integer is in the range [0, 255], `false` otherwise
-///
-/// # Examples
-/// ```moonbit
-/// let _ = @ipaddr.is_valid_ipv4_octet(192) // true
-/// // @ipaddr.is_valid_ipv4_octet(256) returns false (out of range)
-/// let _ = @ipaddr.is_valid_ipv4_octet(0) // true
-/// // @ipaddr.is_valid_ipv4_octet(-1) returns false (out of range)
-/// ```
-///
-pub fn is_valid_ipv4_octet(n : Byte) -> Bool {
+/// Private helper to check if a byte is a valid IPv4 octet (0-255).
+fn is_valid_octet(n : Byte) -> Bool {
   n >= 0 && n <= 255
 }
 
@@ -177,10 +235,10 @@ pub fn is_valid_ipv4_octet(n : Byte) -> Bool {
 
 ///|
 pub fn Ipv4::is_valid(self : Self) -> Bool {
-  is_valid_ipv4_octet(self.a) &&
-  is_valid_ipv4_octet(self.b) &&
-  is_valid_ipv4_octet(self.c) &&
-  is_valid_ipv4_octet(self.d)
+  is_valid_octet(self.a) &&
+  is_valid_octet(self.b) &&
+  is_valid_octet(self.c) &&
+  is_valid_octet(self.d)
 }
 
 ///|
@@ -620,6 +678,64 @@ pub fn Ipv4Prefix::broadcast(self : Self) -> Ipv4 {
   let mask = (0xFFFFFFFF << (32 - self.prefix_len)) & 0xFFFFFFFF
   let broadcast_int = addr_int | (mask.lnot() & 0xFFFFFFFF)
   Ipv4::from_int(broadcast_int)
+}
+
+/// Returns the subnet mask for this CIDR prefix.
+///
+/// The subnet mask indicates which bits are used for the network portion
+/// of the address. For example, a /24 prefix has a mask of 255.255.255.0.
+///
+/// # Returns
+/// An Ipv4 address representing the subnet mask
+///
+/// # Examples
+/// ```moonbit
+/// let subnet = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+/// let mask = subnet.mask()
+/// let _ = mask.format() // "255.255.255.0"
+/// 
+/// let host_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 1), 32)
+/// let host_mask = host_route.mask()
+/// let _ = host_mask.format() // "255.255.255.255"
+/// 
+/// let default_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(0, 0, 0, 0), 0)
+/// let default_mask = default_route.mask()
+/// let _ = default_mask.format() // "0.0.0.0"
+/// ```
+///
+pub fn Ipv4Prefix::mask(self : Self) -> Ipv4 {
+  if self.prefix_len == 0 {
+    return Ipv4::from_int(0)
+  }
+  let mask_int = (0xFFFFFFFF << (32 - self.prefix_len)) & 0xFFFFFFFF
+  Ipv4::from_int(mask_int)
+}
+
+/// Returns the number of host addresses in this subnet.
+///
+/// This includes the network and broadcast addresses. For usable host addresses,
+/// subtract 2 (except for /31 and /32 subnets which have special rules).
+///
+/// # Returns
+/// The total number of addresses in the subnet
+///
+/// # Examples
+/// ```moonbit
+/// let subnet = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+/// let _ = subnet.host_count() // 256 (254 usable)
+/// 
+/// let host_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 1), 32)
+/// let _ = host_route.host_count() // 1
+/// 
+/// let point_to_point = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 31)
+/// let _ = point_to_point.host_count() // 2
+/// ```
+///
+pub fn Ipv4Prefix::host_count(self : Self) -> Int {
+  if self.prefix_len >= 32 {
+    return 1
+  }
+  1 << (32 - self.prefix_len)
 }
 
 ///|

@@ -521,3 +521,104 @@ test "try_from_int_functions" {
     fail("Negative MAC value should return None")
   }
 }
+
+///|
+test "ipv4_prefix_utilities" {
+  // Test subnet mask calculation
+  let subnet24 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+  let mask24 = subnet24.mask()
+  if mask24.format() != "255.255.255.0" {
+    fail("/24 mask should be 255.255.255.0, got: " + mask24.format())
+  }
+
+  let subnet16 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 16)
+  let mask16 = subnet16.mask()
+  if mask16.format() != "255.255.0.0" {
+    fail("/16 mask should be 255.255.0.0, got: " + mask16.format())
+  }
+
+  let host_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(127, 0, 0, 1), 32)
+  let mask32 = host_route.mask()
+  if mask32.format() != "255.255.255.255" {
+    fail("/32 mask should be 255.255.255.255, got: " + mask32.format())
+  }
+
+  let default_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(0, 0, 0, 0), 0)
+  let mask0 = default_route.mask()
+  if mask0.format() != "0.0.0.0" {
+    fail("/0 mask should be 0.0.0.0, got: " + mask0.format())
+  }
+
+  // Test host count calculation
+  let count24 = subnet24.host_count()
+  if count24 != 256 {
+    fail("/24 should have 256 hosts, got: " + count24.to_string())
+  }
+
+  let count16 = subnet16.host_count()
+  if count16 != 65536 {
+    fail("/16 should have 65536 hosts, got: " + count16.to_string())
+  }
+
+  let count32 = host_route.host_count()
+  if count32 != 1 {
+    fail("/32 should have 1 host, got: " + count32.to_string())
+  }
+
+  let point_to_point = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 31)
+  let count31 = point_to_point.host_count()
+  if count31 != 2 {
+    fail("/31 should have 2 hosts, got: " + count31.to_string())
+  }
+
+  let count0 = default_route.host_count()
+  // /0 should have 2^32 hosts, which is a very large number
+  if count0 <= 0 {
+    fail("/0 should have positive host count, got: " + count0.to_string())
+  }
+}
+
+///|
+test "error_based_parsing" {
+  // Test successful parsing
+  match @ipaddr.Ipv4::parse_detailed("192.168.1.1") {
+    Ok(addr) => {
+      if addr.format() != "192.168.1.1" {
+        fail("Detailed parsing should work correctly")
+      }
+    }
+    Err(_) => fail("Valid IPv4 string should parse successfully")
+  }
+
+  // Test invalid format errors
+  match @ipaddr.Ipv4::parse_detailed("192.168.1") {
+    Ok(_) => fail("Incomplete address should return error")
+    Err(InvalidFormat) => () // Expected
+    Err(_) => fail("Should return InvalidFormat error")
+  }
+
+  // Test invalid octet errors
+  match @ipaddr.Ipv4::parse_detailed("256.1.1.1") {
+    Ok(_) => fail("Out of range octet should return error")
+    Err(InvalidOctet(n)) => {
+      if n != 256 {
+        fail("Should return InvalidOctet(256), got: " + n.to_string())
+      }
+    }
+    Err(_) => fail("Should return InvalidOctet error")
+  }
+
+  // Test leading zero format error
+  match @ipaddr.Ipv4::parse_detailed("192.168.01.1") {
+    Ok(_) => fail("Leading zeros should return error")
+    Err(InvalidFormat) => () // Expected
+    Err(_) => fail("Should return InvalidFormat error for leading zeros")
+  }
+
+  // Test non-numeric format error
+  match @ipaddr.Ipv4::parse_detailed("192.168.a.1") {
+    Ok(_) => fail("Non-numeric octet should return error")
+    Err(InvalidFormat) => () // Expected
+    Err(_) => fail("Should return InvalidFormat error for non-numeric")
+  }
+}
