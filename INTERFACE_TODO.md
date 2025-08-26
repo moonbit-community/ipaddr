@@ -9,10 +9,11 @@
   - Add `Ipv4Prefix::parse(String) -> Option<Ipv4Prefix>` (supports "192.168.1.0/24" syntax)
   - Add `Mac::parse(String) -> Option<Mac>`
 
-- [ ] **Expose `to_string` methods via `Show` trait only**
-  - Evaluate whether explicit `format` methods are redundant given `Show` trait; consider deprecating `format`.
+- [x] **Expose `to_string` methods via `Show` trait only**
+  - ~~Evaluate whether explicit `format` methods are redundant given `Show` trait; consider deprecating `format`.~~
+  - **Decision**: Keep both. Show trait provides struct representation for debugging, format() provides human-readable display strings. Both serve different purposes.
 
-- [ ] **Add `try_from_int` variants for safe conversion**
+- [x] **Add `try_from_int` variants for safe conversion**
   - Instead of panicking on invalid input, provide `Ipv4::try_from_int(Int) -> Option<Ipv4>` etc.
 
 - [ ] **Rename `is_valid_ipv4_octet` to `Ipv4::is_valid_octet` and make it private**

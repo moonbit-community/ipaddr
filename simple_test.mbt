@@ -24,6 +24,10 @@ test "ipv4_formatting" {
   if formatted != "192.168.1.1" {
     fail("IPv4 formatting failed")
   }
+  
+  // Note: Show trait produces struct representation, format() produces human-readable
+  // Both serve different purposes - Show for debugging, format for display
+  // This is actually the correct design - keep both methods
 }
 
 ///|
@@ -335,6 +339,9 @@ test "ipv4_parsing" {
   if @ipaddr.Ipv4::parse("") != None {
     fail("Empty string should return None")
   }
+  if @ipaddr.Ipv4::parse("1234.1.1.1") != None {
+    fail("Octet too long should return None")
+  }
 }
 
 ///|
@@ -374,6 +381,16 @@ test "mac_parsing" {
   }
   if @ipaddr.Mac::parse("0:11:22:33:44:55") != None {
     fail("Single hex digit should return None")
+  }
+  
+  // Test lowercase hex parsing
+  match @ipaddr.Mac::parse("aa:bb:cc:dd:ee:ff") {
+    Some(mac) => {
+      if mac.format() != "aa:bb:cc:dd:ee:ff" {
+        fail("Lowercase hex should parse correctly")
+      }
+    }
+    None => fail("Lowercase hex should parse successfully")
   }
 }
 
@@ -431,5 +448,76 @@ test "ipv4_prefix_parsing" {
   }
   if @ipaddr.Ipv4Prefix::parse("192.168.1.0/08") != None {
     fail("Leading zero in prefix should return None")
+  }
+  if @ipaddr.Ipv4Prefix::parse("192.168.1.0/") != None {
+    fail("Empty prefix length should return None")
+  }
+  if @ipaddr.Ipv4Prefix::parse("192.168.1.0/123") != None {
+    fail("Prefix length too long should return None")
+  }
+  if @ipaddr.Ipv4Prefix::parse("192.168.1.0/a") != None {
+    fail("Non-numeric prefix length should return None")
+  }
+}
+
+///|
+test "try_from_int_functions" {
+  // Test Ipv4::try_from_int
+  match @ipaddr.Ipv4::try_from_int(0x7F000001) {
+    Some(addr) => {
+      if addr.format() != "127.0.0.1" {
+        fail("try_from_int should create correct IPv4")
+      }
+    }
+    None => fail("Valid IPv4 integer should succeed")
+  }
+
+  // Test valid edge cases
+  match @ipaddr.Ipv4::try_from_int(0) {
+    Some(addr) => {
+      if addr.format() != "0.0.0.0" {
+        fail("Zero should create 0.0.0.0")
+      }
+    }
+    None => fail("Zero should be valid")
+  }
+
+  // Test with a positive 32-bit value
+  match @ipaddr.Ipv4::try_from_int(0x08080808) { // 8.8.8.8
+    Some(addr) => {
+      if addr.format() != "8.8.8.8" {
+        fail("Positive value should create correct IPv4, got: " + addr.format())
+      }
+    }
+    None => fail("Positive 32-bit value should be valid")
+  }
+
+  // Test invalid cases
+  if @ipaddr.Ipv4::try_from_int(-1) != None {
+    fail("Negative value should return None")
+  }
+
+  // Test Mac::try_from_int
+  match @ipaddr.Mac::try_from_int(0x22334455) {
+    Some(mac) => {
+      if mac.format() != "00:00:22:33:44:55" {
+        fail("try_from_int should create correct MAC")
+      }
+    }
+    None => fail("Valid MAC integer should succeed")
+  }
+
+  match @ipaddr.Mac::try_from_int(0) {
+    Some(mac) => {
+      if mac.format() != "00:00:00:00:00:00" {
+        fail("Zero should create null MAC")
+      }
+    }
+    None => fail("Zero should be valid for MAC")
+  }
+
+  // Test invalid MAC cases
+  if @ipaddr.Mac::try_from_int(-1) != None {
+    fail("Negative MAC value should return None")
   }
 }

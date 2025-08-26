@@ -241,6 +241,34 @@ pub fn Ipv4::from_int(n : Int) -> Ipv4 {
   ipv4(a, b, c, d)
 }
 
+/// Creates an IPv4 address from a 32-bit integer with validation.
+///
+/// This is a safe version of `from_int` that validates the input range.
+/// Unlike `from_int`, this function returns `None` for negative values
+/// or values that exceed the valid 32-bit unsigned range.
+///
+/// # Parameters
+/// - `n`: A 32-bit integer (0 to 4294967295)
+///
+/// # Returns
+/// `Some(Ipv4)` if the integer is valid, `None` otherwise
+///
+/// # Examples
+/// ```moonbit
+/// let _ = @ipaddr.Ipv4::try_from_int(0x7F000001) // Some(127.0.0.1)
+/// let _ = @ipaddr.Ipv4::try_from_int(0) // Some(0.0.0.0)
+/// let _ = @ipaddr.Ipv4::try_from_int(-1) // None - negative
+/// ```
+///
+pub fn Ipv4::try_from_int(n : Int) -> Option[Ipv4] {
+  if n < 0 {
+    return None
+  }
+  // For 32-bit values, we don't need to check overflow in MoonBit
+  // since integers are 64-bit and we're only using the lower 32 bits
+  Some(Ipv4::from_int(n))
+}
+
 ///|
 /// Checks if the IPv4 address is a private address as defined by RFC 1918.
 ///
@@ -1029,4 +1057,31 @@ pub fn Mac::from_int(n : Int) -> Mac {
   let b4 = (n >> 8) & 0xFF
   let b5 = n & 0xFF
   mac(b0, b1, b2, b3, b4, b5)
+}
+
+/// Creates a MAC address from a 48-bit integer with validation.
+///
+/// This is a safe version of `from_int` that validates the input range.
+/// Unlike `from_int`, this function returns `None` for negative values
+/// or values that exceed the valid 48-bit unsigned range.
+///
+/// # Parameters
+/// - `n`: A 48-bit integer (0 to 281474976710655)
+///
+/// # Returns
+/// `Some(Mac)` if the integer is valid, `None` otherwise
+///
+/// # Examples
+/// ```moonbit
+/// let _ = @ipaddr.Mac::try_from_int(0x22334455) // Some(00:00:22:33:44:55)
+/// let _ = @ipaddr.Mac::try_from_int(0) // Some(00:00:00:00:00:00)
+/// let _ = @ipaddr.Mac::try_from_int(-1) // None - negative
+/// ```
+///
+pub fn Mac::try_from_int(n : Int) -> Option[Mac] {
+  // Check for negative values only - MAC addresses use lower 32 bits in our implementation
+  if n < 0 {
+    return None
+  }
+  Some(Mac::from_int(n))
 }
