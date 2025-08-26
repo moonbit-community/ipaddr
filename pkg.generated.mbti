@@ -6,7 +6,7 @@ fn ipv4(Byte, Byte, Byte, Byte) -> Ipv4
 
 fn ipv4_prefix(Ipv4, Int) -> Ipv4Prefix
 
-fn mac(Int, Int, Int, Int, Int, Int) -> Mac
+fn mac(Byte, Byte, Byte, Byte, Byte, Byte) -> Mac
 
 // Errors
 
@@ -57,14 +57,8 @@ impl Eq for Ipv4Prefix
 impl Hash for Ipv4Prefix
 impl Show for Ipv4Prefix
 
-pub struct Mac {
-  b0 : Int
-  b1 : Int
-  b2 : Int
-  b3 : Int
-  b4 : Int
-  b5 : Int
-}
+pub struct Mac(Byte, Byte, Byte, Byte, Byte, Byte)
+
 fn Mac::format(Self) -> String
 fn Mac::from_int(Int) -> Self
 fn Mac::is_broadcast(Self) -> Bool
@@ -72,7 +66,7 @@ fn Mac::is_global(Self) -> Bool
 fn Mac::is_local(Self) -> Bool
 fn Mac::is_multicast(Self) -> Bool
 fn Mac::is_unicast(Self) -> Bool
-fn Mac::new(Int, Int, Int, Int, Int, Int) -> Self
+fn Mac::new(Byte, Byte, Byte, Byte, Byte, Byte) -> Self
 fn Mac::oui(Self) -> (Int, Int, Int)
 fn Mac::parse(String) -> Self?
 fn Mac::to_int(Self) -> Int

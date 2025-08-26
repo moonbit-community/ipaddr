@@ -133,14 +133,14 @@ test "ipv4_prefix_operations" {
 ///|
 test "mac_basic_construction" {
   let addr = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-  if addr.b0 != 0x00 {
-    fail("Expected b0=0x00")
+  if addr.0 != 0x00 {
+    fail("Expected 0=0x00")
   }
-  if addr.b1 != 0x11 {
-    fail("Expected b1=0x11")
+  if addr.1 != 0x11 {
+    fail("Expected 1=0x11")
   }
-  if addr.b5 != 0x55 {
-    fail("Expected b5=0x55")
+  if addr.5 != 0x55 {
+    fail("Expected 5=0x55")
   }
 }
 
@@ -220,17 +220,17 @@ test "mac_int_conversion" {
   let converted_back = @ipaddr.Mac::from_int(int_val)
 
   // Note: int conversion only preserves the lower 4 bytes (b2-b5)
-  if converted_back.b2 != addr.b2 {
-    fail("Round trip conversion failed for b2")
+  if converted_back.2 != addr.2 {
+    fail("Round trip conversion failed for 2")
   }
-  if converted_back.b3 != addr.b3 {
-    fail("Round trip conversion failed for b3")
+  if converted_back.3 != addr.3 {
+    fail("Round trip conversion failed for 3")
   }
-  if converted_back.b4 != addr.b4 {
-    fail("Round trip conversion failed for b4")
+  if converted_back.4 != addr.4 {
+    fail("Round trip conversion failed for 4")
   }
-  if converted_back.b5 != addr.b5 {
-    fail("Round trip conversion failed for b5")
+  if converted_back.5 != addr.5 {
+    fail("Round trip conversion failed for 5")
   }
 }
 

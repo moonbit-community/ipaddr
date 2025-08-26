@@ -736,14 +736,7 @@ pub fn Ipv4Prefix::host_count(self : Self) -> Int {
 ///|
 ///  MAC address (6 bytes)
 ///
-pub struct Mac {
-  b0 : Int
-  b1 : Int
-  b2 : Int
-  b3 : Int
-  b4 : Int
-  b5 : Int
-} derive(Eq, Compare, Show, Hash)
+pub struct Mac(Byte, Byte, Byte, Byte, Byte, Byte) derive(Eq, Compare, Show, Hash)
 
 ///|
 /// Creates a new MAC address from six bytes.
@@ -772,8 +765,8 @@ pub struct Mac {
 /// let _ = @ipaddr.mac(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
 /// ```
 ///
-pub fn mac(b0 : Int, b1 : Int, b2 : Int, b3 : Int, b4 : Int, b5 : Int) -> Mac {
-  { b0, b1, b2, b3, b4, b5 }
+pub fn mac(b0 : Byte, b1 : Byte, b2 : Byte, b3 : Byte, b4 : Byte, b5 : Byte) -> Mac {
+  Mac(b0, b1, b2, b3, b4, b5)
 }
 
 /// Creates a new MAC address from six bytes (OO-style constructor).
@@ -802,8 +795,8 @@ pub fn mac(b0 : Int, b1 : Int, b2 : Int, b3 : Int, b4 : Int, b5 : Int) -> Mac {
 /// let _ = @ipaddr.Mac::new(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
 /// ```
 ///
-pub fn Mac::new(b0 : Int, b1 : Int, b2 : Int, b3 : Int, b4 : Int, b5 : Int) -> Mac {
-  { b0, b1, b2, b3, b4, b5 }
+pub fn Mac::new(b0 : Byte, b1 : Byte, b2 : Byte, b3 : Byte, b4 : Byte, b5 : Byte) -> Mac {
+  Mac(b0, b1, b2, b3, b4, b5)
 }
 
 /// Parses a MAC address from a hexadecimal string.
@@ -843,7 +836,7 @@ pub fn Mac::parse(s : String) -> Option[Mac] {
     }
   }
   
-  Some(mac(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5]))
+  Some(mac(bytes[0].to_byte(), bytes[1].to_byte(), bytes[2].to_byte(), bytes[3].to_byte(), bytes[4].to_byte(), bytes[5].to_byte()))
 }
 
 fn parse_hex_byte(s : String) -> Option[Int] {
@@ -922,12 +915,12 @@ fn format_hex8(n : Int) -> String {
 /// ```
 ///
 pub fn Mac::format(self : Self) -> String {
-  let h0 = format_hex8(self.b0)
-  let h1 = format_hex8(self.b1)
-  let h2 = format_hex8(self.b2)
-  let h3 = format_hex8(self.b3)
-  let h4 = format_hex8(self.b4)
-  let h5 = format_hex8(self.b5)
+  let h0 = format_hex8(self.0.to_int())
+  let h1 = format_hex8(self.1.to_int())
+  let h2 = format_hex8(self.2.to_int())
+  let h3 = format_hex8(self.3.to_int())
+  let h4 = format_hex8(self.4.to_int())
+  let h5 = format_hex8(self.5.to_int())
   "\{h0}:\{h1}:\{h2}:\{h3}:\{h4}:\{h5}"
 }
 
@@ -953,12 +946,12 @@ pub fn Mac::format(self : Self) -> String {
 /// ```
 ///
 pub fn Mac::is_broadcast(self : Self) -> Bool {
-  self.b0 == 0xFF &&
-  self.b1 == 0xFF &&
-  self.b2 == 0xFF &&
-  self.b3 == 0xFF &&
-  self.b4 == 0xFF &&
-  self.b5 == 0xFF
+  self.0 == 0xFF &&
+  self.1 == 0xFF &&
+  self.2 == 0xFF &&
+  self.3 == 0xFF &&
+  self.4 == 0xFF &&
+  self.5 == 0xFF
 }
 
 ///|
@@ -989,7 +982,7 @@ pub fn Mac::is_broadcast(self : Self) -> Bool {
 /// ```
 ///
 pub fn Mac::is_multicast(self : Self) -> Bool {
-  (self.b0 & 0x01) != 0
+  (self.0.to_int() & 0x01) != 0
 }
 
 /// Checks if the MAC address is a unicast address.
@@ -1018,7 +1011,7 @@ pub fn Mac::is_multicast(self : Self) -> Bool {
 
 ///|
 pub fn Mac::is_unicast(self : Self) -> Bool {
-  (self.b0 & 0x01) == 0
+  (self.0.to_int() & 0x01) == 0
 }
 
 ///|
@@ -1047,7 +1040,7 @@ pub fn Mac::is_unicast(self : Self) -> Bool {
 /// ```
 ///
 pub fn Mac::is_local(self : Self) -> Bool {
-  (self.b0 & 0x02) != 0
+  (self.0.to_int() & 0x02) != 0
 }
 
 ///|
@@ -1076,7 +1069,7 @@ pub fn Mac::is_local(self : Self) -> Bool {
 /// ```
 ///
 pub fn Mac::is_global(self : Self) -> Bool {
-  (self.b0 & 0x02) == 0
+  (self.0.to_int() & 0x02) == 0
 }
 
 ///|
@@ -1104,7 +1097,7 @@ pub fn Mac::is_global(self : Self) -> Bool {
 /// ```
 ///
 pub fn Mac::oui(self : Self) -> (Int, Int, Int) {
-  (self.b0, self.b1, self.b2)
+  (self.0.to_int(), self.1.to_int(), self.2.to_int())
 }
 
 ///|
@@ -1130,7 +1123,7 @@ pub fn Mac::oui(self : Self) -> (Int, Int, Int) {
 /// ```
 ///
 pub fn Mac::to_int(self : Self) -> Int {
-  (self.b2 << 24) | (self.b3 << 16) | (self.b4 << 8) | self.b5
+  (self.2.to_int() << 24) | (self.3.to_int() << 16) | (self.4.to_int() << 8) | self.5.to_int()
 }
 
 ///|
@@ -1161,12 +1154,12 @@ pub fn Mac::to_int(self : Self) -> Int {
 /// ```
 ///
 pub fn Mac::from_int(n : Int) -> Mac {
-  let b0 = 0
-  let b1 = 0
-  let b2 = (n >> 24) & 0xFF
-  let b3 = (n >> 16) & 0xFF
-  let b4 = (n >> 8) & 0xFF
-  let b5 = n & 0xFF
+  let b0 = (0).to_byte()
+  let b1 = (0).to_byte()
+  let b2 = ((n >> 24) & 0xFF).to_byte()
+  let b3 = ((n >> 16) & 0xFF).to_byte()
+  let b4 = ((n >> 8) & 0xFF).to_byte()
+  let b5 = (n & 0xFF).to_byte()
   mac(b0, b1, b2, b3, b4, b5)
 }
 
