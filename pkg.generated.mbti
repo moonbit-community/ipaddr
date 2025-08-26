@@ -2,53 +2,13 @@
 package "bobzhang/ipaddr"
 
 // Values
-fn format_ipv4(Ipv4) -> String
-
-fn format_mac(Mac) -> String
-
-fn int_to_ipv4(Int) -> Ipv4
-
-fn int_to_mac(Int) -> Mac
-
 fn ipv4(Int, Int, Int, Int) -> Ipv4
 
-fn ipv4_is_broadcast(Ipv4) -> Bool
-
-fn ipv4_is_loopback(Ipv4) -> Bool
-
-fn ipv4_is_multicast(Ipv4) -> Bool
-
-fn ipv4_is_private(Ipv4) -> Bool
-
 fn ipv4_prefix(Ipv4, Int) -> Ipv4Prefix
-
-fn ipv4_prefix_broadcast(Ipv4Prefix) -> Ipv4
-
-fn ipv4_prefix_contains(Ipv4Prefix, Ipv4) -> Bool
-
-fn ipv4_prefix_network(Ipv4Prefix) -> Ipv4
-
-fn ipv4_to_int(Ipv4) -> Int
-
-fn is_valid_ipv4(Ipv4) -> Bool
 
 fn is_valid_ipv4_octet(Int) -> Bool
 
 fn mac(Int, Int, Int, Int, Int, Int) -> Mac
-
-fn mac_is_broadcast(Mac) -> Bool
-
-fn mac_is_global(Mac) -> Bool
-
-fn mac_is_local(Mac) -> Bool
-
-fn mac_is_multicast(Mac) -> Bool
-
-fn mac_is_unicast(Mac) -> Bool
-
-fn mac_oui(Mac) -> (Int, Int, Int)
-
-fn mac_to_int(Mac) -> Int
 
 // Errors
 
@@ -59,6 +19,14 @@ pub struct Ipv4 {
   c : Int
   d : Int
 }
+fn Ipv4::format(Self) -> String
+fn Ipv4::from_int(Int) -> Self
+fn Ipv4::is_broadcast(Self) -> Bool
+fn Ipv4::is_loopback(Self) -> Bool
+fn Ipv4::is_multicast(Self) -> Bool
+fn Ipv4::is_private(Self) -> Bool
+fn Ipv4::is_valid(Self) -> Bool
+fn Ipv4::to_int(Self) -> Int
 impl Compare for Ipv4
 impl Eq for Ipv4
 impl Show for Ipv4
@@ -67,6 +35,9 @@ pub struct Ipv4Prefix {
   addr : Ipv4
   prefix_len : Int
 }
+fn Ipv4Prefix::broadcast(Self) -> Ipv4
+fn Ipv4Prefix::contains(Self, Ipv4) -> Bool
+fn Ipv4Prefix::network(Self) -> Ipv4
 impl Compare for Ipv4Prefix
 impl Eq for Ipv4Prefix
 impl Show for Ipv4Prefix
@@ -79,6 +50,15 @@ pub struct Mac {
   b4 : Int
   b5 : Int
 }
+fn Mac::format(Self) -> String
+fn Mac::from_int(Int) -> Self
+fn Mac::is_broadcast(Self) -> Bool
+fn Mac::is_global(Self) -> Bool
+fn Mac::is_local(Self) -> Bool
+fn Mac::is_multicast(Self) -> Bool
+fn Mac::is_unicast(Self) -> Bool
+fn Mac::oui(Self) -> (Int, Int, Int)
+fn Mac::to_int(Self) -> Int
 impl Compare for Mac
 impl Eq for Mac
 impl Show for Mac

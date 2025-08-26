@@ -20,7 +20,7 @@ test "ipv4_basic_construction" {
 ///|
 test "ipv4_formatting" {
   let addr = @ipaddr.ipv4(192, 168, 1, 1)
-  let formatted = @ipaddr.format_ipv4(addr)
+  let formatted = addr.format()
   if formatted != "192.168.1.1" {
     fail("IPv4 formatting failed")
   }
@@ -30,10 +30,10 @@ test "ipv4_formatting" {
 test "ipv4_validation" {
   let valid_addr = @ipaddr.ipv4(192, 168, 1, 1)
   let invalid_addr = @ipaddr.ipv4(256, 168, 1, 1)
-  if not(@ipaddr.is_valid_ipv4(valid_addr)) {
+  if not(valid_addr.is_valid()) {
     fail("Valid IPv4 should be valid")
   }
-  if @ipaddr.is_valid_ipv4(invalid_addr) {
+  if invalid_addr.is_valid() {
     fail("Invalid IPv4 should be invalid")
   }
 }
@@ -41,8 +41,8 @@ test "ipv4_validation" {
 ///|
 test "ipv4_int_conversion" {
   let addr = @ipaddr.ipv4(192, 168, 1, 1)
-  let int_val = @ipaddr.ipv4_to_int(addr)
-  let converted_back = @ipaddr.int_to_ipv4(int_val)
+  let int_val = addr.to_int()
+  let converted_back = @ipaddr.Ipv4::from_int(int_val)
   if converted_back.a != addr.a {
     fail("Round trip conversion failed for a")
   }
@@ -60,40 +60,40 @@ test "ipv4_int_conversion" {
 ///|
 test "ipv4_classification" {
   // Private addresses
-  if not(@ipaddr.ipv4_is_private(@ipaddr.ipv4(10, 0, 0, 1))) {
+  if not(@ipaddr.ipv4(10, 0, 0, 1).is_private()) {
     fail("10.0.0.1 should be private")
   }
-  if not(@ipaddr.ipv4_is_private(@ipaddr.ipv4(172, 16, 0, 1))) {
+  if not(@ipaddr.ipv4(172, 16, 0, 1).is_private()) {
     fail("172.16.0.1 should be private")
   }
-  if not(@ipaddr.ipv4_is_private(@ipaddr.ipv4(192, 168, 1, 1))) {
+  if not(@ipaddr.ipv4(192, 168, 1, 1).is_private()) {
     fail("192.168.1.1 should be private")
   }
-  if @ipaddr.ipv4_is_private(@ipaddr.ipv4(8, 8, 8, 8)) {
+  if @ipaddr.ipv4(8, 8, 8, 8).is_private() {
     fail("8.8.8.8 should not be private")
   }
 
   // Loopback
-  if not(@ipaddr.ipv4_is_loopback(@ipaddr.ipv4(127, 0, 0, 1))) {
+  if not(@ipaddr.ipv4(127, 0, 0, 1).is_loopback()) {
     fail("127.0.0.1 should be loopback")
   }
-  if @ipaddr.ipv4_is_loopback(@ipaddr.ipv4(192, 168, 1, 1)) {
+  if @ipaddr.ipv4(192, 168, 1, 1).is_loopback() {
     fail("192.168.1.1 should not be loopback")
   }
 
   // Multicast
-  if not(@ipaddr.ipv4_is_multicast(@ipaddr.ipv4(224, 0, 0, 1))) {
+  if not(@ipaddr.ipv4(224, 0, 0, 1).is_multicast()) {
     fail("224.0.0.1 should be multicast")
   }
-  if @ipaddr.ipv4_is_multicast(@ipaddr.ipv4(192, 168, 1, 1)) {
+  if @ipaddr.ipv4(192, 168, 1, 1).is_multicast() {
     fail("192.168.1.1 should not be multicast")
   }
 
   // Broadcast
-  if not(@ipaddr.ipv4_is_broadcast(@ipaddr.ipv4(255, 255, 255, 255))) {
+  if not(@ipaddr.ipv4(255, 255, 255, 255).is_broadcast()) {
     fail("255.255.255.255 should be broadcast")
   }
-  if @ipaddr.ipv4_is_broadcast(@ipaddr.ipv4(192, 168, 1, 255)) {
+  if @ipaddr.ipv4(192, 168, 1, 255).is_broadcast() {
     fail("192.168.1.255 should not be broadcast")
   }
 }
@@ -104,17 +104,17 @@ test "ipv4_prefix_operations" {
   let addr1 = @ipaddr.ipv4(192, 168, 1, 1)
   let addr2 = @ipaddr.ipv4(192, 168, 1, 255)
   let addr3 = @ipaddr.ipv4(192, 168, 2, 1)
-  if not(@ipaddr.ipv4_prefix_contains(prefix, addr1)) {
+  if not(prefix.contains(addr1)) {
     fail("192.168.1.1 should be in 192.168.1.0/24")
   }
-  if not(@ipaddr.ipv4_prefix_contains(prefix, addr2)) {
+  if not(prefix.contains(addr2)) {
     fail("192.168.1.255 should be in 192.168.1.0/24")
   }
-  if @ipaddr.ipv4_prefix_contains(prefix, addr3) {
+  if prefix.contains(addr3) {
     fail("192.168.2.1 should not be in 192.168.1.0/24")
   }
-  let network = @ipaddr.ipv4_prefix_network(prefix)
-  let broadcast = @ipaddr.ipv4_prefix_broadcast(prefix)
+  let network = prefix.network()
+  let broadcast = prefix.broadcast()
   if network.a != 192 || network.b != 168 || network.c != 1 || network.d != 0 {
     fail("Network address should be 192.168.1.0")
   }
@@ -143,7 +143,7 @@ test "mac_basic_construction" {
 ///|
 test "mac_formatting" {
   let addr = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-  let formatted = @ipaddr.format_mac(addr)
+  let formatted = addr.format()
   if formatted != "00:11:22:33:44:55" {
     fail("MAC formatting failed")
   }
@@ -153,43 +153,43 @@ test "mac_formatting" {
 test "mac_classification" {
   // Broadcast
   let broadcast = @ipaddr.mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
-  if not(@ipaddr.mac_is_broadcast(broadcast)) {
+  if not(broadcast.is_broadcast()) {
     fail("ff:ff:ff:ff:ff:ff should be broadcast")
   }
 
   // Multicast (first bit set)
   let multicast = @ipaddr.mac(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
-  if not(@ipaddr.mac_is_multicast(multicast)) {
+  if not(multicast.is_multicast()) {
     fail("01:00:5e:00:00:01 should be multicast")
   }
-  if @ipaddr.mac_is_unicast(multicast) {
+  if multicast.is_unicast() {
     fail("01:00:5e:00:00:01 should not be unicast")
   }
 
   // Unicast (first bit clear)
   let unicast = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-  if not(@ipaddr.mac_is_unicast(unicast)) {
+  if not(unicast.is_unicast()) {
     fail("00:11:22:33:44:55 should be unicast")
   }
-  if @ipaddr.mac_is_multicast(unicast) {
+  if unicast.is_multicast() {
     fail("00:11:22:33:44:55 should not be multicast")
   }
 
   // Local (second bit set)
   let local_mac = @ipaddr.mac(0x02, 0x11, 0x22, 0x33, 0x44, 0x55)
-  if not(@ipaddr.mac_is_local(local_mac)) {
+  if not(local_mac.is_local()) {
     fail("02:11:22:33:44:55 should be local")
   }
-  if @ipaddr.mac_is_global(local_mac) {
+  if local_mac.is_global() {
     fail("02:11:22:33:44:55 should not be global")
   }
 
   // Global (second bit clear)
   let global = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-  if not(@ipaddr.mac_is_global(global)) {
+  if not(global.is_global()) {
     fail("00:11:22:33:44:55 should be global")
   }
-  if @ipaddr.mac_is_local(global) {
+  if global.is_local() {
     fail("00:11:22:33:44:55 should not be local")
   }
 }
@@ -197,7 +197,7 @@ test "mac_classification" {
 ///|
 test "mac_oui" {
   let addr = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-  let (oui0, oui1, oui2) = @ipaddr.mac_oui(addr)
+  let (oui0, oui1, oui2) = addr.oui()
   if oui0 != 0x00 {
     fail("Expected oui0=0x00")
   }
@@ -212,8 +212,8 @@ test "mac_oui" {
 ///|
 test "mac_int_conversion" {
   let addr = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-  let int_val = @ipaddr.mac_to_int(addr)
-  let converted_back = @ipaddr.int_to_mac(int_val)
+  let int_val = addr.to_int()
+  let converted_back = @ipaddr.Mac::from_int(int_val)
 
   // Note: int conversion only preserves the lower 4 bytes (b2-b5)
   if converted_back.b2 != addr.b2 {
