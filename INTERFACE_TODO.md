@@ -1,7 +1,7 @@
 - ## Interface Design Review TODOs
 - The following checklist contains potential improvements to the public API generated in `pkg.generated.mbti`. Please review each item and mark the ones that make sense to implement.
 - [x] change IPV4 each field from Int to Byte
-- [ ] **Consolidate constructors into associated `new` functions**
+- [x] **Consolidate constructors into associated `new` functions**
   - Replace global `ipv4`, `ipv4_prefix`, and `mac` with `Ipv4::new`, `Ipv4Prefix::new`, and `Mac::new` to align with OO style.
 
 - [ ] **Provide parsing from string helpers**

@@ -35,6 +35,29 @@ pub fn ipv4(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
   { a, b, c, d }
 }
 
+/// Creates a new IPv4 address from four octets (OO-style constructor).
+///
+/// # Parameters
+/// - `a`: First octet (0-255)
+/// - `b`: Second octet (0-255) 
+/// - `c`: Third octet (0-255)
+/// - `d`: Fourth octet (0-255)
+///
+/// # Examples
+/// ```moonbit
+/// let _ = @ipaddr.Ipv4::new(127, 0, 0, 1)
+/// let _ = @ipaddr.Ipv4::new(192, 168, 1, 100)
+/// let _ = @ipaddr.Ipv4::new(8, 8, 8, 8)
+/// ```
+///
+/// # Note
+/// This function does not validate that the octets are in the valid range (0-255).
+/// Use `Ipv4::is_valid()` to check if the resulting address is valid.
+///
+pub fn Ipv4::new(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
+  { a, b, c, d }
+}
+
 ///|
 /// Formats the IPv4 address as a dotted decimal string.
 ///
@@ -313,6 +336,34 @@ pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
   { addr, prefix_len }
 }
 
+/// Creates a new IPv4 CIDR prefix from an address and prefix length (OO-style constructor).
+///
+/// A CIDR prefix represents a network subnet using an IPv4 address and a prefix length.
+/// The prefix length indicates how many bits from the left are used for the network portion.
+///
+/// # Parameters
+/// - `addr`: The IPv4 address (typically the network address)
+/// - `prefix_len`: The prefix length in bits (0-32)
+///
+/// # Returns
+/// An Ipv4Prefix representing the network subnet
+///
+/// # Examples
+/// ```moonbit
+/// // Create a /24 subnet (255.255.255.0 netmask)
+/// let _ = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+/// 
+/// // Create a /16 subnet (255.255.0.0 netmask)
+/// let _ = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 16)
+/// 
+/// // Create a /32 host route (255.255.255.255 netmask)
+/// let _ = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(8, 8, 8, 8), 32)
+/// ```
+///
+pub fn Ipv4Prefix::new(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
+  { addr, prefix_len }
+}
+
 ///|
 /// Checks if an IPv4 address is contained within this CIDR prefix/subnet.
 ///
@@ -460,6 +511,36 @@ pub struct Mac {
 /// ```
 ///
 pub fn mac(b0 : Int, b1 : Int, b2 : Int, b3 : Int, b4 : Int, b5 : Int) -> Mac {
+  { b0, b1, b2, b3, b4, b5 }
+}
+
+/// Creates a new MAC address from six bytes (OO-style constructor).
+///
+/// MAC (Media Access Control) addresses are 48-bit identifiers used to uniquely
+/// identify network interfaces. They are typically displayed in hexadecimal format
+/// separated by colons (e.g., "00:11:22:33:44:55").
+///
+/// # Parameters
+/// - `b0`: First byte (most significant)
+/// - `b1`: Second byte
+/// - `b2`: Third byte
+/// - `b3`: Fourth byte
+/// - `b4`: Fifth byte
+/// - `b5`: Sixth byte (least significant)
+///
+/// # Examples
+/// ```moonbit
+/// // Create a typical MAC address
+/// let _ = @ipaddr.Mac::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
+/// 
+/// // Create a broadcast MAC address
+/// let _ = @ipaddr.Mac::new(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
+/// 
+/// // Create a multicast MAC address (first bit of first byte is 1)
+/// let _ = @ipaddr.Mac::new(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
+/// ```
+///
+pub fn Mac::new(b0 : Int, b1 : Int, b2 : Int, b3 : Int, b4 : Int, b5 : Int) -> Mac {
   { b0, b1, b2, b3, b4, b5 }
 }
 

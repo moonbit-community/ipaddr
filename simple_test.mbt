@@ -268,3 +268,28 @@ test "ipv4_prefix_zero_length" {
     fail("/0 broadcast should be 255.255.255.255")
   }
 }
+
+///|
+test "oo_style_constructors" {
+  // Test Ipv4::new constructor
+  let ipv4_old = @ipaddr.ipv4(192, 168, 1, 1)
+  let ipv4_new = @ipaddr.Ipv4::new(192, 168, 1, 1)
+  if ipv4_old.format() != ipv4_new.format() {
+    fail("Ipv4::new should produce same result as ipv4")
+  }
+
+  // Test Ipv4Prefix::new constructor
+  let prefix_old = @ipaddr.ipv4_prefix(@ipaddr.ipv4(192, 168, 1, 0), 24)
+  let prefix_new = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+  let test_addr = @ipaddr.ipv4(192, 168, 1, 100)
+  if prefix_old.contains(test_addr) != prefix_new.contains(test_addr) {
+    fail("Ipv4Prefix::new should produce same result as ipv4_prefix")
+  }
+
+  // Test Mac::new constructor
+  let mac_old = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
+  let mac_new = @ipaddr.Mac::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
+  if mac_old.format() != mac_new.format() {
+    fail("Mac::new should produce same result as mac")
+  }
+}
