@@ -27,8 +27,8 @@
 - [x] **Add error enum for parsing/validation errors**
   - Centralise error handling instead of returning `Option`.
 
-- [ ] **Document trait implementations in interface**
+- [x] **Document trait implementations in interface**
   - Ensure `Hash` or `Ord` traits are implemented where logical.
 
-- [ ] **Re-generate interface after adopting changes**
+- [x] **Re-generate interface after adopting changes**
   - Run `moon info` to update `pkg.generated.mbti`.

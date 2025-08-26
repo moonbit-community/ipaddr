@@ -636,3 +636,47 @@ test "error_based_parsing" {
     Err(_) => fail("Should return InvalidFormat error for too long octet")
   }
 }
+
+///|
+test "hash_trait_functionality" {
+  // Test that Hash trait works for using addresses as map keys
+  let addr1 = @ipaddr.Ipv4::new(192, 168, 1, 1)
+  let addr2 = @ipaddr.Ipv4::new(192, 168, 1, 1)
+  let addr3 = @ipaddr.Ipv4::new(192, 168, 1, 2)
+  
+  // Equal addresses should have equal hashes
+  if addr1 != addr2 {
+    fail("Equal IPv4 addresses should be equal")
+  }
+  
+  // Different addresses should not be equal
+  if addr1 == addr3 {
+    fail("Different IPv4 addresses should not be equal")
+  }
+  
+  // Test with MAC addresses
+  let mac1 = @ipaddr.Mac::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
+  let mac2 = @ipaddr.Mac::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
+  let mac3 = @ipaddr.Mac::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x56)
+  
+  if mac1 != mac2 {
+    fail("Equal MAC addresses should be equal")
+  }
+  
+  if mac1 == mac3 {
+    fail("Different MAC addresses should not be equal")
+  }
+  
+  // Test with prefixes
+  let prefix1 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+  let prefix2 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+  let prefix3 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 25)
+  
+  if prefix1 != prefix2 {
+    fail("Equal prefixes should be equal")
+  }
+  
+  if prefix1 == prefix3 {
+    fail("Different prefixes should not be equal")
+  }
+}

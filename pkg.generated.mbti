@@ -2,22 +2,31 @@
 package "bobzhang/ipaddr"
 
 // Values
-fn ipv4(Int, Int, Int, Int) -> Ipv4
+fn ipv4(Byte, Byte, Byte, Byte) -> Ipv4
 
 fn ipv4_prefix(Ipv4, Int) -> Ipv4Prefix
-
-fn is_valid_ipv4_octet(Int) -> Bool
 
 fn mac(Int, Int, Int, Int, Int, Int) -> Mac
 
 // Errors
 
 // Types and methods
+pub enum IpAddrError {
+  InvalidFormat
+  InvalidOctet(Int)
+  InvalidPrefixLength(Int)
+  InvalidHexByte(String)
+  OutOfRange
+}
+impl Eq for IpAddrError
+impl Hash for IpAddrError
+impl Show for IpAddrError
+
 pub struct Ipv4 {
-  a : Int
-  b : Int
-  c : Int
-  d : Int
+  a : Byte
+  b : Byte
+  c : Byte
+  d : Byte
 }
 fn Ipv4::format(Self) -> String
 fn Ipv4::from_int(Int) -> Self
@@ -26,9 +35,14 @@ fn Ipv4::is_loopback(Self) -> Bool
 fn Ipv4::is_multicast(Self) -> Bool
 fn Ipv4::is_private(Self) -> Bool
 fn Ipv4::is_valid(Self) -> Bool
+fn Ipv4::new(Byte, Byte, Byte, Byte) -> Self
+fn Ipv4::parse(String) -> Self?
+fn Ipv4::parse_detailed(String) -> Result[Self, IpAddrError]
 fn Ipv4::to_int(Self) -> Int
+fn Ipv4::try_from_int(Int) -> Self?
 impl Compare for Ipv4
 impl Eq for Ipv4
+impl Hash for Ipv4
 impl Show for Ipv4
 
 pub struct Ipv4Prefix {
@@ -37,9 +51,14 @@ pub struct Ipv4Prefix {
 }
 fn Ipv4Prefix::broadcast(Self) -> Ipv4
 fn Ipv4Prefix::contains(Self, Ipv4) -> Bool
+fn Ipv4Prefix::host_count(Self) -> Int
+fn Ipv4Prefix::mask(Self) -> Ipv4
 fn Ipv4Prefix::network(Self) -> Ipv4
+fn Ipv4Prefix::new(Ipv4, Int) -> Self
+fn Ipv4Prefix::parse(String) -> Self?
 impl Compare for Ipv4Prefix
 impl Eq for Ipv4Prefix
+impl Hash for Ipv4Prefix
 impl Show for Ipv4Prefix
 
 pub struct Mac {
@@ -57,10 +76,14 @@ fn Mac::is_global(Self) -> Bool
 fn Mac::is_local(Self) -> Bool
 fn Mac::is_multicast(Self) -> Bool
 fn Mac::is_unicast(Self) -> Bool
+fn Mac::new(Int, Int, Int, Int, Int, Int) -> Self
 fn Mac::oui(Self) -> (Int, Int, Int)
+fn Mac::parse(String) -> Self?
 fn Mac::to_int(Self) -> Int
+fn Mac::try_from_int(Int) -> Self?
 impl Compare for Mac
 impl Eq for Mac
+impl Hash for Mac
 impl Show for Mac
 
 // Type aliases

@@ -10,7 +10,7 @@ pub enum IpAddrError {
   InvalidPrefixLength(Int)
   InvalidHexByte(String)
   OutOfRange
-} derive(Eq, Show)
+} derive(Eq, Show, Hash)
 
 ///|
 pub struct Ipv4 {
@@ -18,7 +18,7 @@ pub struct Ipv4 {
   b : Byte
   c : Byte
   d : Byte
-} derive(Eq, Compare, Show)
+} derive(Eq, Compare, Show, Hash)
 
 ///|
 /// Creates a new IPv4 address from four octets.
@@ -451,7 +451,7 @@ pub fn Ipv4::is_broadcast(self : Self) -> Bool {
 pub struct Ipv4Prefix {
   addr : Ipv4
   prefix_len : Int
-} derive(Eq, Compare, Show)
+} derive(Eq, Compare, Show, Hash)
 
 ///|
 /// Creates a new IPv4 CIDR prefix from an address and prefix length.
@@ -748,7 +748,7 @@ pub struct Mac {
   b3 : Int
   b4 : Int
   b5 : Int
-} derive(Eq, Compare, Show)
+} derive(Eq, Compare, Show, Hash)
 
 ///|
 /// Creates a new MAC address from six bytes.
