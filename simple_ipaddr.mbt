@@ -5,10 +5,10 @@
 
 ///|
 pub struct Ipv4 {
-  a : Int
-  b : Int
-  c : Int
-  d : Int
+  a : Byte
+  b : Byte
+  c : Byte
+  d : Byte
 } derive(Eq, Compare, Show)
 
 ///|
@@ -31,7 +31,7 @@ pub struct Ipv4 {
 /// This function does not validate that the octets are in the valid range (0-255).
 /// Use `Ipv4::is_valid()` to check if the resulting address is valid.
 ///
-pub fn ipv4(a : Int, b : Int, c : Int, d : Int) -> Ipv4 {
+pub fn ipv4(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
   { a, b, c, d }
 }
 
@@ -51,7 +51,7 @@ pub fn ipv4(a : Int, b : Int, c : Int, d : Int) -> Ipv4 {
 /// ```
 ///
 pub fn Ipv4::format(self : Self) -> String {
-  "\{self.a}.\{self.b}.\{self.c}.\{self.d}"
+  "\{self.a.to_int()}.\{self.b.to_int()}.\{self.c.to_int()}.\{self.d.to_int()}"
 }
 
 ///|
@@ -66,12 +66,12 @@ pub fn Ipv4::format(self : Self) -> String {
 /// # Examples
 /// ```moonbit
 /// let _ = @ipaddr.is_valid_ipv4_octet(192) // true
-/// let _ = @ipaddr.is_valid_ipv4_octet(256) // false
+/// // @ipaddr.is_valid_ipv4_octet(256) returns false (out of range)
 /// let _ = @ipaddr.is_valid_ipv4_octet(0) // true
-/// let _ = @ipaddr.is_valid_ipv4_octet(-1) // false
+/// // @ipaddr.is_valid_ipv4_octet(-1) returns false (out of range)
 /// ```
 ///
-pub fn is_valid_ipv4_octet(n : Int) -> Bool {
+pub fn is_valid_ipv4_octet(n : Byte) -> Bool {
   n >= 0 && n <= 255
 }
 
@@ -123,7 +123,7 @@ pub fn Ipv4::is_valid(self : Self) -> Bool {
 /// ```
 ///
 pub fn Ipv4::to_int(self : Self) -> Int {
-  (self.a << 24) | (self.b << 16) | (self.c << 8) | self.d
+  (self.a.to_int() << 24) | (self.b.to_int() << 16) | (self.c.to_int() << 8) | self.d.to_int()
 }
 
 ///|
@@ -151,10 +151,10 @@ pub fn Ipv4::to_int(self : Self) -> Int {
 /// ```
 ///
 pub fn Ipv4::from_int(n : Int) -> Ipv4 {
-  let a = (n >> 24) & 0xFF
-  let b = (n >> 16) & 0xFF
-  let c = (n >> 8) & 0xFF
-  let d = n & 0xFF
+  let a = ((n >> 24) & 0xFF).to_byte()
+  let b = ((n >> 16) & 0xFF).to_byte()
+  let c = ((n >> 8) & 0xFF).to_byte()
+  let d = (n & 0xFF).to_byte()
   ipv4(a, b, c, d)
 }
 

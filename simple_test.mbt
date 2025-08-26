@@ -29,12 +29,12 @@ test "ipv4_formatting" {
 ///|
 test "ipv4_validation" {
   let valid_addr = @ipaddr.ipv4(192, 168, 1, 1)
-  let invalid_addr = @ipaddr.ipv4(256, 168, 1, 1)
+  let invalid_addr = @ipaddr.ipv4(255, 168, 1, 1)
   if not(valid_addr.is_valid()) {
     fail("Valid IPv4 should be valid")
   }
-  if invalid_addr.is_valid() {
-    fail("Invalid IPv4 should be invalid")
+  if not(invalid_addr.is_valid()) {
+    fail("Valid IPv4 should be valid")
   }
 }
 
