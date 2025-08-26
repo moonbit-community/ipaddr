@@ -621,4 +621,18 @@ test "error_based_parsing" {
     Err(InvalidFormat) => () // Expected
     Err(_) => fail("Should return InvalidFormat error for non-numeric")
   }
+
+  // Test empty octet error
+  match @ipaddr.Ipv4::parse_detailed("192.168..1") {
+    Ok(_) => fail("Empty octet should return error")
+    Err(InvalidFormat) => () // Expected
+    Err(_) => fail("Should return InvalidFormat error for empty octet")
+  }
+
+  // Test too long octet error
+  match @ipaddr.Ipv4::parse_detailed("192.168.1234.1") {
+    Ok(_) => fail("Too long octet should return error")
+    Err(InvalidFormat) => () // Expected
+    Err(_) => fail("Should return InvalidFormat error for too long octet")
+  }
 }
