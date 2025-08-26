@@ -5,5 +5,6 @@
   "repository": "https://github.com/bobzhang/ipaddr",
   "license": "ISC",
   "keywords": ["ip", "ipv4", "ipv6", "mac", "address", "network", "cidr"],
-  "description": "A library for manipulation of IP (IPv4/IPv6) and MAC address representations"
+  "description": "A library for manipulation of IP (IPv4/IPv6) and MAC address representations",
+  "alert-list": "+test_import_all"
 }
