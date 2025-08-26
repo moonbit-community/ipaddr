@@ -22,12 +22,8 @@ impl Eq for IpAddrError
 impl Hash for IpAddrError
 impl Show for IpAddrError
 
-pub struct Ipv4 {
-  a : Byte
-  b : Byte
-  c : Byte
-  d : Byte
-}
+pub struct Ipv4(Byte, Byte, Byte, Byte)
+
 fn Ipv4::format(Self) -> String
 fn Ipv4::from_int(Int) -> Self
 fn Ipv4::is_broadcast(Self) -> Bool

@@ -13,12 +13,7 @@ pub enum IpAddrError {
 } derive(Eq, Show, Hash)
 
 ///|
-pub struct Ipv4 {
-  a : Byte
-  b : Byte
-  c : Byte
-  d : Byte
-} derive(Eq, Compare, Show, Hash)
+pub struct Ipv4(Byte, Byte, Byte, Byte) derive(Eq, Compare, Show, Hash)
 
 ///|
 /// Creates a new IPv4 address from four octets.
@@ -41,7 +36,7 @@ pub struct Ipv4 {
 /// Use `Ipv4::is_valid()` to check if the resulting address is valid.
 ///
 pub fn ipv4(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
-  { a, b, c, d }
+  Ipv4(a, b, c, d)
 }
 
 /// Creates a new IPv4 address from four octets (OO-style constructor).
@@ -64,7 +59,7 @@ pub fn ipv4(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
 /// Use `Ipv4::is_valid()` to check if the resulting address is valid.
 ///
 pub fn Ipv4::new(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
-  { a, b, c, d }
+  Ipv4(a, b, c, d)
 }
 
 /// Parses an IPv4 address from a dotted decimal string.
@@ -208,7 +203,7 @@ pub fn Ipv4::parse_detailed(s : String) -> Result[Ipv4, IpAddrError] {
 /// ```
 ///
 pub fn Ipv4::format(self : Self) -> String {
-  "\{self.a.to_int()}.\{self.b.to_int()}.\{self.c.to_int()}.\{self.d.to_int()}"
+  "\{self.0.to_int()}.\{self.1.to_int()}.\{self.2.to_int()}.\{self.3.to_int()}"
 }
 
 /// Private helper to check if a byte is a valid IPv4 octet (0-255).
@@ -235,10 +230,10 @@ fn is_valid_octet(n : Byte) -> Bool {
 
 ///|
 pub fn Ipv4::is_valid(self : Self) -> Bool {
-  is_valid_octet(self.a) &&
-  is_valid_octet(self.b) &&
-  is_valid_octet(self.c) &&
-  is_valid_octet(self.d)
+  is_valid_octet(self.0) &&
+  is_valid_octet(self.1) &&
+  is_valid_octet(self.2) &&
+  is_valid_octet(self.3)
 }
 
 ///|
@@ -264,7 +259,7 @@ pub fn Ipv4::is_valid(self : Self) -> Bool {
 /// ```
 ///
 pub fn Ipv4::to_int(self : Self) -> Int {
-  (self.a.to_int() << 24) | (self.b.to_int() << 16) | (self.c.to_int() << 8) | self.d.to_int()
+  (self.0.to_int() << 24) | (self.1.to_int() << 16) | (self.2.to_int() << 8) | self.3.to_int()
 }
 
 ///|
@@ -355,15 +350,15 @@ pub fn Ipv4::try_from_int(n : Int) -> Option[Ipv4] {
 ///
 pub fn Ipv4::is_private(self : Self) -> Bool {
   // 10.0.0.0/8
-  if self.a == 10 {
+  if self.0 == 10 {
     return true
   }
   // 172.16.0.0/12
-  if self.a == 172 && self.b >= 16 && self.b <= 31 {
+  if self.0 == 172 && self.1 >= 16 && self.1 <= 31 {
     return true
   }
   // 192.168.0.0/16
-  if self.a == 192 && self.b == 168 {
+  if self.0 == 192 && self.1 == 168 {
     return true
   }
   false
@@ -391,7 +386,7 @@ pub fn Ipv4::is_private(self : Self) -> Bool {
 /// ```
 ///
 pub fn Ipv4::is_loopback(self : Self) -> Bool {
-  self.a == 127
+  self.0 == 127
 }
 
 ///|
@@ -417,7 +412,7 @@ pub fn Ipv4::is_loopback(self : Self) -> Bool {
 /// ```
 ///
 pub fn Ipv4::is_multicast(self : Self) -> Bool {
-  self.a >= 224 && self.a <= 239
+  self.0 >= 224 && self.0 <= 239
 }
 
 ///|
@@ -442,7 +437,7 @@ pub fn Ipv4::is_multicast(self : Self) -> Bool {
 /// ```
 ///
 pub fn Ipv4::is_broadcast(self : Self) -> Bool {
-  self.a == 255 && self.b == 255 && self.c == 255 && self.d == 255
+  self.0 == 255 && self.1 == 255 && self.2 == 255 && self.3 == 255
 }
 
 ///|

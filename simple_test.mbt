@@ -3,17 +3,17 @@
 ///|
 test "ipv4_basic_construction" {
   let addr = @ipaddr.ipv4(192, 168, 1, 1)
-  if addr.a != 192 {
-    fail("Expected a=192")
+  if addr.0 != 192 {
+    fail("Expected 0=192")
   }
-  if addr.b != 168 {
-    fail("Expected b=168")
+  if addr.1 != 168 {
+    fail("Expected 1=168")
   }
-  if addr.c != 1 {
-    fail("Expected c=1")
+  if addr.2 != 1 {
+    fail("Expected 2=1")
   }
-  if addr.d != 1 {
-    fail("Expected d=1")
+  if addr.3 != 1 {
+    fail("Expected 3=1")
   }
 }
 
@@ -47,17 +47,17 @@ test "ipv4_int_conversion" {
   let addr = @ipaddr.ipv4(192, 168, 1, 1)
   let int_val = addr.to_int()
   let converted_back = @ipaddr.Ipv4::from_int(int_val)
-  if converted_back.a != addr.a {
-    fail("Round trip conversion failed for a")
+  if converted_back.0 != addr.0 {
+    fail("Round trip conversion failed for 0")
   }
-  if converted_back.b != addr.b {
-    fail("Round trip conversion failed for b")
+  if converted_back.1 != addr.1 {
+    fail("Round trip conversion failed for 1")
   }
-  if converted_back.c != addr.c {
-    fail("Round trip conversion failed for c")
+  if converted_back.2 != addr.2 {
+    fail("Round trip conversion failed for 2")
   }
-  if converted_back.d != addr.d {
-    fail("Round trip conversion failed for d")
+  if converted_back.3 != addr.3 {
+    fail("Round trip conversion failed for 3")
   }
 }
 
@@ -119,13 +119,13 @@ test "ipv4_prefix_operations" {
   }
   let network = prefix.network()
   let broadcast = prefix.broadcast()
-  if network.a != 192 || network.b != 168 || network.c != 1 || network.d != 0 {
+  if network.0 != 192 || network.1 != 168 || network.2 != 1 || network.3 != 0 {
     fail("Network address should be 192.168.1.0")
   }
-  if broadcast.a != 192 ||
-    broadcast.b != 168 ||
-    broadcast.c != 1 ||
-    broadcast.d != 255 {
+  if broadcast.0 != 192 ||
+    broadcast.1 != 168 ||
+    broadcast.2 != 1 ||
+    broadcast.3 != 255 {
     fail("Broadcast address should be 192.168.1.255")
   }
 }
@@ -259,16 +259,16 @@ test "ipv4_prefix_zero_length" {
 
   // /0 network should be 0.0.0.0
   let network = default_route.network()
-  if network.a != 0 || network.b != 0 || network.c != 0 || network.d != 0 {
+  if network.0 != 0 || network.1 != 0 || network.2 != 0 || network.3 != 0 {
     fail("/0 network should be 0.0.0.0")
   }
 
   // /0 broadcast should be 255.255.255.255
   let broadcast = default_route.broadcast()
-  if broadcast.a != 255 ||
-    broadcast.b != 255 ||
-    broadcast.c != 255 ||
-    broadcast.d != 255 {
+  if broadcast.0 != 255 ||
+    broadcast.1 != 255 ||
+    broadcast.2 != 255 ||
+    broadcast.3 != 255 {
     fail("/0 broadcast should be 255.255.255.255")
   }
 }
