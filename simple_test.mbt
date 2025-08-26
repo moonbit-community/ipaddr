@@ -229,3 +229,40 @@ test "mac_int_conversion" {
     fail("Round trip conversion failed for b5")
   }
 }
+
+///|
+test "ipv4_prefix_zero_length" {
+  // Test the special case of /0 prefix (default route)
+  let default_route = @ipaddr.ipv4_prefix(@ipaddr.ipv4(8, 8, 8, 8), 0)
+  
+  // /0 prefix should contain any address
+  let test_addr1 = @ipaddr.ipv4(192, 168, 1, 1)
+  let test_addr2 = @ipaddr.ipv4(10, 0, 0, 1)
+  let test_addr3 = @ipaddr.ipv4(127, 0, 0, 1)
+  let test_addr4 = @ipaddr.ipv4(255, 255, 255, 255)
+  
+  if not(default_route.contains(test_addr1)) {
+    fail("/0 prefix should contain 192.168.1.1")
+  }
+  if not(default_route.contains(test_addr2)) {
+    fail("/0 prefix should contain 10.0.0.1")
+  }
+  if not(default_route.contains(test_addr3)) {
+    fail("/0 prefix should contain 127.0.0.1")
+  }
+  if not(default_route.contains(test_addr4)) {
+    fail("/0 prefix should contain 255.255.255.255")
+  }
+  
+  // /0 network should be 0.0.0.0
+  let network = default_route.network()
+  if network.a != 0 || network.b != 0 || network.c != 0 || network.d != 0 {
+    fail("/0 network should be 0.0.0.0")
+  }
+  
+  // /0 broadcast should be 255.255.255.255
+  let broadcast = default_route.broadcast()
+  if broadcast.a != 255 || broadcast.b != 255 || broadcast.c != 255 || broadcast.d != 255 {
+    fail("/0 broadcast should be 255.255.255.255")
+  }
+}
