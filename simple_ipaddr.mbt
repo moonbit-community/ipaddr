@@ -2,6 +2,7 @@
 // This is a basic implementation focusing on core functionality
 
 // IPv4 address representation
+
 ///|
 pub struct Ipv4 {
   a : Int
@@ -10,6 +11,7 @@ pub struct Ipv4 {
   d : Int
 } derive(Eq, Compare, Show)
 
+///|
 /// Creates a new IPv4 address from four octets.
 ///
 /// # Parameters
@@ -28,11 +30,12 @@ pub struct Ipv4 {
 /// # Note
 /// This function does not validate that the octets are in the valid range (0-255).
 /// Use `Ipv4::is_valid()` to check if the resulting address is valid.
-///|
+///
 pub fn ipv4(a : Int, b : Int, c : Int, d : Int) -> Ipv4 {
   { a, b, c, d }
 }
 
+///|
 /// Formats the IPv4 address as a dotted decimal string.
 ///
 /// # Returns
@@ -46,11 +49,12 @@ pub fn ipv4(a : Int, b : Int, c : Int, d : Int) -> Ipv4 {
 /// let localhost = ipv4(127, 0, 0, 1)
 /// let str = localhost.format() // "127.0.0.1"
 /// ```
-///|
+///
 pub fn Ipv4::format(self : Self) -> String {
   "\{self.a}.\{self.b}.\{self.c}.\{self.d}"
 }
 
+///|
 /// Checks if an integer is a valid IPv4 octet (0-255).
 ///
 /// # Parameters
@@ -66,7 +70,7 @@ pub fn Ipv4::format(self : Self) -> String {
 /// let edge_case = is_valid_ipv4_octet(0) // true
 /// let negative = is_valid_ipv4_octet(-1) // false
 /// ```
-///|
+///
 pub fn is_valid_ipv4_octet(n : Int) -> Bool {
   n >= 0 && n <= 255
 }
@@ -87,6 +91,7 @@ pub fn is_valid_ipv4_octet(n : Int) -> Bool {
 /// let edge_addr = ipv4(0, 0, 0, 0)
 /// let is_edge_valid = edge_addr.is_valid() // true
 /// ```
+
 ///|
 pub fn Ipv4::is_valid(self : Self) -> Bool {
   is_valid_ipv4_octet(self.a) &&
@@ -95,6 +100,7 @@ pub fn Ipv4::is_valid(self : Self) -> Bool {
   is_valid_ipv4_octet(self.d)
 }
 
+///|
 /// Converts the IPv4 address to a 32-bit integer in network byte order.
 ///
 /// The conversion follows the standard network byte order (big-endian):
@@ -115,11 +121,12 @@ pub fn Ipv4::is_valid(self : Self) -> Bool {
 /// let zero = ipv4(0, 0, 0, 0)
 /// let zero_int = zero.to_int() // 0
 /// ```
-///|
+///
 pub fn Ipv4::to_int(self : Self) -> Int {
   (self.a << 24) | (self.b << 16) | (self.c << 8) | self.d
 }
 
+///|
 /// Creates an IPv4 address from a 32-bit integer in network byte order.
 ///
 /// The conversion follows the standard network byte order (big-endian):
@@ -142,7 +149,7 @@ pub fn Ipv4::to_int(self : Self) -> Int {
 /// 
 /// let zero = Ipv4::from_int(0) // 0.0.0.0
 /// ```
-///|
+///
 pub fn Ipv4::from_int(n : Int) -> Ipv4 {
   let a = (n >> 24) & 0xFF
   let b = (n >> 16) & 0xFF
@@ -151,6 +158,7 @@ pub fn Ipv4::from_int(n : Int) -> Ipv4 {
   ipv4(a, b, c, d)
 }
 
+///|
 /// Checks if the IPv4 address is a private address as defined by RFC 1918.
 ///
 /// Private address ranges are:
@@ -175,7 +183,7 @@ pub fn Ipv4::from_int(n : Int) -> Ipv4 {
 /// let public_addr = ipv4(8, 8, 8, 8)
 /// let is_public = public_addr.is_private() // false
 /// ```
-///|
+///
 pub fn Ipv4::is_private(self : Self) -> Bool {
   // 10.0.0.0/8
   if self.a == 10 {
@@ -192,6 +200,7 @@ pub fn Ipv4::is_private(self : Self) -> Bool {
   false
 }
 
+///|
 /// Checks if the IPv4 address is a loopback address.
 ///
 /// Loopback addresses are in the range 127.0.0.0/8 (127.0.0.0 to 127.255.255.255).
@@ -211,11 +220,12 @@ pub fn Ipv4::is_private(self : Self) -> Bool {
 /// let not_loopback = ipv4(192, 168, 1, 1)
 /// let is_not_loopback = not_loopback.is_loopback() // false
 /// ```
-///|
+///
 pub fn Ipv4::is_loopback(self : Self) -> Bool {
   self.a == 127
 }
 
+///|
 /// Checks if the IPv4 address is a multicast address.
 ///
 /// Multicast addresses are in the range 224.0.0.0/4 (224.0.0.0 to 239.255.255.255).
@@ -236,11 +246,12 @@ pub fn Ipv4::is_loopback(self : Self) -> Bool {
 /// let unicast = ipv4(192, 168, 1, 1)
 /// let is_not_multicast = unicast.is_multicast() // false
 /// ```
-///|
+///
 pub fn Ipv4::is_multicast(self : Self) -> Bool {
   self.a >= 224 && self.a <= 239
 }
 
+///|
 /// Checks if the IPv4 address is the limited broadcast address.
 ///
 /// The limited broadcast address is 255.255.255.255, which is used to send
@@ -260,19 +271,20 @@ pub fn Ipv4::is_multicast(self : Self) -> Bool {
 /// let almost_broadcast = ipv4(255, 255, 255, 254)
 /// let is_almost = almost_broadcast.is_broadcast() // false
 /// ```
-///|
+///
 pub fn Ipv4::is_broadcast(self : Self) -> Bool {
   self.a == 255 && self.b == 255 && self.c == 255 && self.d == 255
 }
 
-// IPv4 CIDR prefix
-
 ///|
+///  IPv4 CIDR prefix
+///
 pub struct Ipv4Prefix {
   addr : Ipv4
   prefix_len : Int
 } derive(Eq, Compare, Show)
 
+///|
 /// Creates a new IPv4 CIDR prefix from an address and prefix length.
 ///
 /// A CIDR prefix represents a network subnet using an IPv4 address and a prefix length.
@@ -296,11 +308,12 @@ pub struct Ipv4Prefix {
 /// // Create a /32 host route (255.255.255.255 netmask)
 /// let host_route = ipv4_prefix(ipv4(8, 8, 8, 8), 32)
 /// ```
-///|
+///
 pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
   { addr, prefix_len }
 }
 
+///|
 /// Checks if an IPv4 address is contained within this CIDR prefix/subnet.
 ///
 /// This method determines if the given address belongs to the network defined
@@ -329,7 +342,7 @@ pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
 /// let all_networks = ipv4_prefix(ipv4(0, 0, 0, 0), 0)
 /// let contains_all = all_networks.contains(ipv4(8, 8, 8, 8)) // true
 /// ```
-///|
+///
 pub fn Ipv4Prefix::contains(self : Self, addr : Ipv4) -> Bool {
   if self.prefix_len == 0 {
     return true
@@ -340,6 +353,7 @@ pub fn Ipv4Prefix::contains(self : Self, addr : Ipv4) -> Bool {
   (prefix_int & mask) == (addr_int & mask)
 }
 
+///|
 /// Gets the network address for this IPv4 prefix.
 ///
 /// The network address is the first address in the subnet, obtained by
@@ -361,7 +375,7 @@ pub fn Ipv4Prefix::contains(self : Self, addr : Ipv4) -> Bool {
 /// let default_route = ipv4_prefix(ipv4(8, 8, 8, 8), 0)
 /// let default_network = default_route.network() // 0.0.0.0
 /// ```
-///|
+///
 pub fn Ipv4Prefix::network(self : Self) -> Ipv4 {
   if self.prefix_len == 0 {
     return ipv4(0, 0, 0, 0)
@@ -372,6 +386,7 @@ pub fn Ipv4Prefix::network(self : Self) -> Ipv4 {
   Ipv4::from_int(network_int)
 }
 
+///|
 /// Gets the broadcast address for this IPv4 prefix.
 ///
 /// The broadcast address is the last address in the subnet, obtained by
@@ -394,7 +409,7 @@ pub fn Ipv4Prefix::network(self : Self) -> Ipv4 {
 /// let default_route = ipv4_prefix(ipv4(0, 0, 0, 0), 0)
 /// let default_broadcast = default_route.broadcast() // 255.255.255.255
 /// ```
-///|
+///
 pub fn Ipv4Prefix::broadcast(self : Self) -> Ipv4 {
   if self.prefix_len == 0 {
     return ipv4(255, 255, 255, 255)
@@ -405,9 +420,9 @@ pub fn Ipv4Prefix::broadcast(self : Self) -> Ipv4 {
   Ipv4::from_int(broadcast_int)
 }
 
-// MAC address (6 bytes)
-
 ///|
+///  MAC address (6 bytes)
+///
 pub struct Mac {
   b0 : Int
   b1 : Int
@@ -417,6 +432,7 @@ pub struct Mac {
   b5 : Int
 } derive(Eq, Compare, Show)
 
+///|
 /// Creates a new MAC address from six bytes.
 ///
 /// MAC (Media Access Control) addresses are 48-bit identifiers used to uniquely
@@ -442,11 +458,12 @@ pub struct Mac {
 /// // Create a multicast MAC address (first bit of first byte is 1)
 /// let multicast = mac(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
 /// ```
-///|
+///
 pub fn mac(b0 : Int, b1 : Int, b2 : Int, b3 : Int, b4 : Int, b5 : Int) -> Mac {
   { b0, b1, b2, b3, b4, b5 }
 }
 
+///|
 /// Helper function to format a byte as a two-digit lowercase hexadecimal string.
 ///
 /// This internal utility function converts an integer (0-255) to a two-character
@@ -467,7 +484,7 @@ pub fn mac(b0 : Int, b1 : Int, b2 : Int, b3 : Int, b4 : Int, b5 : Int) -> Mac {
 /// let hex_255 = format_hex8(255) // "ff"
 /// let hex_171 = format_hex8(171) // "ab"
 /// ```
-///|
+///
 fn format_hex8(n : Int) -> String {
   let hex_chars = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
@@ -477,6 +494,7 @@ fn format_hex8(n : Int) -> String {
   String::from_array([hex_chars[high], hex_chars[low]])
 }
 
+///|
 /// Formats the MAC address as a colon-separated hexadecimal string.
 ///
 /// The format follows the standard MAC address notation with lowercase
@@ -496,7 +514,7 @@ fn format_hex8(n : Int) -> String {
 /// let zero_mac = mac(0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
 /// let zero_str = zero_mac.format() // "00:00:00:00:00:00"
 /// ```
-///|
+///
 pub fn Mac::format(self : Self) -> String {
   let h0 = format_hex8(self.b0)
   let h1 = format_hex8(self.b1)
@@ -507,6 +525,7 @@ pub fn Mac::format(self : Self) -> String {
   "\{h0}:\{h1}:\{h2}:\{h3}:\{h4}:\{h5}"
 }
 
+///|
 /// Checks if the MAC address is the broadcast address.
 ///
 /// The broadcast MAC address is ff:ff:ff:ff:ff:ff, which is used to send
@@ -526,7 +545,7 @@ pub fn Mac::format(self : Self) -> String {
 /// let almost_broadcast = mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE)
 /// let is_almost = almost_broadcast.is_broadcast() // false
 /// ```
-///|
+///
 pub fn Mac::is_broadcast(self : Self) -> Bool {
   self.b0 == 0xFF &&
   self.b1 == 0xFF &&
@@ -536,6 +555,7 @@ pub fn Mac::is_broadcast(self : Self) -> Bool {
   self.b5 == 0xFF
 }
 
+///|
 /// Checks if the MAC address is a multicast address.
 ///
 /// A MAC address is multicast if the least significant bit of the first octet
@@ -559,7 +579,7 @@ pub fn Mac::is_broadcast(self : Self) -> Bool {
 /// let unicast = mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let is_not_multicast = unicast.is_multicast() // false
 /// ```
-///|
+///
 pub fn Mac::is_multicast(self : Self) -> Bool {
   (self.b0 & 0x01) != 0
 }
@@ -587,11 +607,13 @@ pub fn Mac::is_multicast(self : Self) -> Bool {
 /// let multicast = mac(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
 /// let is_not_unicast = multicast.is_unicast() // false
 /// ```
+
 ///|
 pub fn Mac::is_unicast(self : Self) -> Bool {
   (self.b0 & 0x01) == 0
 }
 
+///|
 /// Checks if the MAC address is locally administered.
 ///
 /// A MAC address is locally administered if the second least significant bit
@@ -615,11 +637,12 @@ pub fn Mac::is_unicast(self : Self) -> Bool {
 /// let global_mac = mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let is_not_local = global_mac.is_local() // false
 /// ```
-///|
+///
 pub fn Mac::is_local(self : Self) -> Bool {
   (self.b0 & 0x02) != 0
 }
 
+///|
 /// Checks if the MAC address is globally unique.
 ///
 /// A MAC address is globally unique if the second least significant bit
@@ -643,11 +666,12 @@ pub fn Mac::is_local(self : Self) -> Bool {
 /// let local_mac = mac(0x02, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let is_not_global = local_mac.is_global() // false
 /// ```
-///|
+///
 pub fn Mac::is_global(self : Self) -> Bool {
   (self.b0 & 0x02) == 0
 }
 
+///|
 /// Gets the Organizationally Unique Identifier (OUI) from the MAC address.
 ///
 /// The OUI is the first three bytes of a MAC address, assigned by the IEEE
@@ -670,11 +694,12 @@ pub fn Mac::is_global(self : Self) -> Bool {
 /// let intel_mac = mac(0x00, 0x15, 0x17, 0xAB, 0xCD, 0xEF)
 /// let (i0, i1, i2) = intel_mac.oui() // (0x00, 0x15, 0x17)
 /// ```
-///|
+///
 pub fn Mac::oui(self : Self) -> (Int, Int, Int) {
   (self.b0, self.b1, self.b2)
 }
 
+///|
 /// Converts the MAC address to a 32-bit integer using the lower 4 bytes.
 ///
 /// This conversion uses only the last 4 bytes (b2, b3, b4, b5) of the MAC address
@@ -695,11 +720,12 @@ pub fn Mac::oui(self : Self) -> (Int, Int, Int) {
 /// let zero_mac = mac(0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00)
 /// let zero_int = zero_mac.to_int() // 0 (ignores first two 0xFF bytes)
 /// ```
-///|
+///
 pub fn Mac::to_int(self : Self) -> Int {
   (self.b2 << 24) | (self.b3 << 16) | (self.b4 << 8) | self.b5
 }
 
+///|
 /// Creates a MAC address from a 32-bit integer, setting only the lower 4 bytes.
 ///
 /// This conversion creates a MAC address where the first two bytes (b0, b1) are
@@ -725,7 +751,7 @@ pub fn Mac::to_int(self : Self) -> Int {
 /// let int_val = original.to_int()
 /// let restored = Mac::from_int(int_val) // Same as original
 /// ```
-///|
+///
 pub fn Mac::from_int(n : Int) -> Mac {
   let b0 = 0
   let b1 = 0
