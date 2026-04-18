@@ -78,32 +78,6 @@ pub fn Ipv4::new(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
 /// let _ = @ipaddr.Ipv4::parse("192.168.1") // None - wrong format
 /// ```
 ///
-fn parse_octet(s : String) -> Option[Byte] {
-  if s.length() == 0 || s.length() > 3 {
-    return None
-  }
-  
-  let mut result = 0
-  let mut i = 0
-  while i < s.length() {
-    let c = s[i]
-    if c < '0' || c > '9' {
-      return None
-    }
-    result = result * 10 + (c - 48)
-    if result > 255 {
-      return None
-    }
-    i = i + 1
-  }
-  
-  // Don't allow leading zeros (except for "0")
-  if s.length() > 1 && s[0] == '0' {
-    return None
-  }
-  
-  Some(result.to_byte())
-}
 
 fn parse_octet_detailed(s : String) -> Result[Byte, IpAddrError] {
   if s.length() == 0 {
@@ -136,20 +110,10 @@ fn parse_octet_detailed(s : String) -> Result[Byte, IpAddrError] {
 }
 
 pub fn Ipv4::parse(s : String) -> Option[Ipv4] {
-  let parts = s.split(".").collect()
-  if parts.length() != 4 {
-    return None
+  match Ipv4::parse_detailed(s) {
+    Ok(ipv4) => Some(ipv4)
+    Err(_) => None
   }
-  
-  let octets : Array[Byte] = []
-  for i = 0; i < 4; i = i + 1 {
-    match parse_octet(parts[i].to_string()) {
-      Some(n) => octets.push(n)
-      None => return None
-    }
-  }
-  
-  Some(ipv4(octets[0], octets[1], octets[2], octets[3]))
 }
 
 /// Parses an IPv4 address from a dotted decimal string with detailed error information.
@@ -314,12 +278,17 @@ pub fn Ipv4::from_int(n : Int) -> Ipv4 {
 /// ```
 ///
 pub fn Ipv4::try_from_int(n : Int) -> Option[Ipv4] {
-  if n < 0 {
-    return None
+  match Ipv4::try_from_int_detailed(n) {
+    Ok(ipv4) => Some(ipv4)
+    Err(_) => None
   }
-  // For 32-bit values, we don't need to check overflow in MoonBit
-  // since integers are 64-bit and we're only using the lower 32 bits
-  Some(Ipv4::from_int(n))
+}
+
+pub fn Ipv4::try_from_int_detailed(n : Int) -> Result[Ipv4, IpAddrError] {
+  if n < 0 {
+    return Err(OutOfRange)
+  }
+  Ok(Ipv4::from_int(n))
 }
 
 ///|
@@ -521,29 +490,37 @@ pub fn Ipv4Prefix::new(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
 /// ```
 ///
 pub fn Ipv4Prefix::parse(s : String) -> Option[Ipv4Prefix] {
+  match Ipv4Prefix::parse_detailed(s) {
+    Ok(prefix) => Some(prefix)
+    Err(_) => None
+  }
+}
+
+pub fn Ipv4Prefix::parse_detailed(s : String) -> Result[Ipv4Prefix, IpAddrError] {
   let parts = s.split("/").collect()
   if parts.length() != 2 {
-    return None
+    return Err(InvalidFormat)
   }
   
   // Parse the IPv4 address part
-  let addr = match Ipv4::parse(parts[0].to_string()) {
-    Some(a) => a
-    None => return None
+  let addr = match Ipv4::parse_detailed(parts[0].to_string()) {
+    Ok(a) => a
+    Err(e) => return Err(e)
   }
   
   // Parse the prefix length part
-  let prefix_len = match parse_prefix_len(parts[1].to_string()) {
-    Some(n) => n
-    None => return None
+  let prefix_len = match parse_prefix_len_detailed(parts[1].to_string()) {
+    Ok(n) => n
+    Err(e) => return Err(e)
   }
   
-  Some(ipv4_prefix(addr, prefix_len))
+  Ok(ipv4_prefix(addr, prefix_len))
 }
 
-fn parse_prefix_len(s : String) -> Option[Int] {
+
+fn parse_prefix_len_detailed(s : String) -> Result[Int, IpAddrError] {
   if s.length() == 0 || s.length() > 2 {
-    return None
+    return Err(InvalidFormat)
   }
   
   let mut result = 0
@@ -551,21 +528,21 @@ fn parse_prefix_len(s : String) -> Option[Int] {
   while i < s.length() {
     let c = s[i]
     if c < '0' || c > '9' {
-      return None
+      return Err(InvalidFormat)
     }
     result = result * 10 + (c - 48)
     if result > 32 {
-      return None
+      return Err(InvalidPrefixLength(result))
     }
     i = i + 1
   }
   
   // Don't allow leading zeros (except for single "0")
   if s.length() > 1 && s[0] == '0' {
-    return None
+    return Err(InvalidFormat)
   }
   
-  Some(result)
+  Ok(result)
 }
 
 ///|
@@ -815,33 +792,41 @@ pub fn Mac::new(b0 : Byte, b1 : Byte, b2 : Byte, b3 : Byte, b4 : Byte, b5 : Byte
 /// ```
 ///
 pub fn Mac::parse(s : String) -> Option[Mac] {
+  match Mac::parse_detailed(s) {
+    Ok(mac) => Some(mac)
+    Err(_) => None
+  }
+}
+
+pub fn Mac::parse_detailed(s : String) -> Result[Mac, IpAddrError] {
   // Try colon separator first, then dash
   let parts = if s.contains(":") {
     s.split(":").collect()
   } else if s.contains("-") {
     s.split("-").collect()
   } else {
-    return None
+    return Err(InvalidFormat)
   }
   
   if parts.length() != 6 {
-    return None
+    return Err(InvalidFormat)
   }
   
   let bytes : Array[Int] = []
   for i = 0; i < 6; i = i + 1 {
-    match parse_hex_byte(parts[i].to_string()) {
-      Some(n) => bytes.push(n)
-      None => return None
+    match parse_hex_byte_detailed(parts[i].to_string()) {
+      Ok(n) => bytes.push(n)
+      Err(e) => return Err(e)
     }
   }
   
-  Some(mac(bytes[0].to_byte(), bytes[1].to_byte(), bytes[2].to_byte(), bytes[3].to_byte(), bytes[4].to_byte(), bytes[5].to_byte()))
+  Ok(mac(bytes[0].to_byte(), bytes[1].to_byte(), bytes[2].to_byte(), bytes[3].to_byte(), bytes[4].to_byte(), bytes[5].to_byte()))
 }
 
-fn parse_hex_byte(s : String) -> Option[Int] {
+
+fn parse_hex_byte_detailed(s : String) -> Result[Int, IpAddrError] {
   if s.length() != 2 {
-    return None
+    return Err(InvalidHexByte(s))
   }
   
   let mut result = 0
@@ -855,13 +840,13 @@ fn parse_hex_byte(s : String) -> Option[Int] {
     } else if c >= 'A' && c <= 'F' {
       c - 55  // 'A' = 65, so 'A' - 55 = 10
     } else {
-      return None
+      return Err(InvalidHexByte(s))
     }
     result = result * 16 + digit
     i = i + 1
   }
   
-  Some(result)
+  Ok(result)
 }
 
 ///|
@@ -1183,9 +1168,15 @@ pub fn Mac::from_int(n : Int) -> Mac {
 /// ```
 ///
 pub fn Mac::try_from_int(n : Int) -> Option[Mac] {
-  // Check for negative values only - MAC addresses use lower 32 bits in our implementation
-  if n < 0 {
-    return None
+  match Mac::try_from_int_detailed(n) {
+    Ok(mac) => Some(mac)
+    Err(_) => None
   }
-  Some(Mac::from_int(n))
+}
+
+pub fn Mac::try_from_int_detailed(n : Int) -> Result[Mac, IpAddrError] {
+  if n < 0 {
+    return Err(OutOfRange)
+  }
+  Ok(Mac::from_int(n))
 }
