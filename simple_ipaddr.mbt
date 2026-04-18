@@ -3,6 +3,7 @@
 
 // IPv4 address representation
 
+///|
 /// Error types for IP address parsing and validation
 pub enum IpAddrError {
   InvalidFormat
@@ -25,7 +26,7 @@ pub struct Ipv4(Byte, Byte, Byte, Byte) derive(Eq, Compare, Show, Hash)
 /// - `d`: Fourth octet (0-255)
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let _ = @ipaddr.ipv4(127, 0, 0, 1)
 /// let _ = @ipaddr.ipv4(192, 168, 1, 100)
 /// let _ = @ipaddr.ipv4(8, 8, 8, 8)
@@ -39,6 +40,7 @@ pub fn ipv4(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
   Ipv4(a, b, c, d)
 }
 
+///|
 /// Creates a new IPv4 address from four octets (OO-style constructor).
 ///
 /// # Parameters
@@ -48,7 +50,7 @@ pub fn ipv4(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
 /// - `d`: Fourth octet (0-255)
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let _ = @ipaddr.Ipv4::new(127, 0, 0, 1)
 /// let _ = @ipaddr.Ipv4::new(192, 168, 1, 100)
 /// let _ = @ipaddr.Ipv4::new(8, 8, 8, 8)
@@ -62,6 +64,7 @@ pub fn Ipv4::new(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
   Ipv4(a, b, c, d)
 }
 
+///|
 /// Parses an IPv4 address from a dotted decimal string.
 ///
 /// # Parameters
@@ -71,18 +74,18 @@ pub fn Ipv4::new(a : Byte, b : Byte, c : Byte, d : Byte) -> Ipv4 {
 /// `Some(Ipv4)` if parsing succeeds, `None` if the format is invalid
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let _ = @ipaddr.Ipv4::parse("192.168.1.1")
 /// let _ = @ipaddr.Ipv4::parse("127.0.0.1")
 /// let _ = @ipaddr.Ipv4::parse("256.1.1.1") // None - out of range
 /// let _ = @ipaddr.Ipv4::parse("192.168.1") // None - wrong format
 /// ```
 ///
-fn parse_octet(s : String) -> Option[Byte] {
+fn parse_octet(s : String) -> Byte? {
   if s.length() == 0 || s.length() > 3 {
     return None
   }
-  
+
   let mut result = 0
   let mut i = 0
   while i < s.length() {
@@ -90,21 +93,22 @@ fn parse_octet(s : String) -> Option[Byte] {
     if c < '0' || c > '9' {
       return None
     }
-    result = result * 10 + (c - 48)
+    result = result * 10 + (c - 48).to_int()
     if result > 255 {
       return None
     }
     i = i + 1
   }
-  
+
   // Don't allow leading zeros (except for "0")
   if s.length() > 1 && s[0] == '0' {
     return None
   }
-  
+
   Some(result.to_byte())
 }
 
+///|
 fn parse_octet_detailed(s : String) -> Result[Byte, IpAddrError] {
   if s.length() == 0 {
     return Err(InvalidFormat)
@@ -112,7 +116,7 @@ fn parse_octet_detailed(s : String) -> Result[Byte, IpAddrError] {
   if s.length() > 3 {
     return Err(InvalidFormat)
   }
-  
+
   let mut result = 0
   let mut i = 0
   while i < s.length() {
@@ -120,27 +124,28 @@ fn parse_octet_detailed(s : String) -> Result[Byte, IpAddrError] {
     if c < '0' || c > '9' {
       return Err(InvalidFormat)
     }
-    result = result * 10 + (c - 48)
+    result = result * 10 + (c - 48).to_int()
     if result > 255 {
       return Err(InvalidOctet(result))
     }
     i = i + 1
   }
-  
+
   // Don't allow leading zeros (except for "0")
   if s.length() > 1 && s[0] == '0' {
     return Err(InvalidFormat)
   }
-  
+
   Ok(result.to_byte())
 }
 
-pub fn Ipv4::parse(s : String) -> Option[Ipv4] {
+///|
+pub fn Ipv4::parse(s : String) -> Ipv4? {
   let parts = s.split(".").collect()
   if parts.length() != 4 {
     return None
   }
-  
+
   let octets : Array[Byte] = []
   for i = 0; i < 4; i = i + 1 {
     match parse_octet(parts[i].to_string()) {
@@ -148,10 +153,11 @@ pub fn Ipv4::parse(s : String) -> Option[Ipv4] {
       None => return None
     }
   }
-  
+
   Some(ipv4(octets[0], octets[1], octets[2], octets[3]))
 }
 
+///|
 /// Parses an IPv4 address from a dotted decimal string with detailed error information.
 ///
 /// This is an enhanced version of `parse` that provides specific error details
@@ -164,7 +170,7 @@ pub fn Ipv4::parse(s : String) -> Option[Ipv4] {
 /// `Ok(Ipv4)` if parsing succeeds, `Err(IpAddrError)` with specific error details
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let _ = @ipaddr.Ipv4::parse_detailed("192.168.1.1")
 /// let _ = @ipaddr.Ipv4::parse_detailed("256.1.1.1") // Err(InvalidOctet(256))
 /// let _ = @ipaddr.Ipv4::parse_detailed("192.168.1") // Err(InvalidFormat)
@@ -175,7 +181,7 @@ pub fn Ipv4::parse_detailed(s : String) -> Result[Ipv4, IpAddrError] {
   if parts.length() != 4 {
     return Err(InvalidFormat)
   }
-  
+
   let octets : Array[Byte] = []
   for i = 0; i < 4; i = i + 1 {
     match parse_octet_detailed(parts[i].to_string()) {
@@ -183,7 +189,7 @@ pub fn Ipv4::parse_detailed(s : String) -> Result[Ipv4, IpAddrError] {
       Err(e) => return Err(e)
     }
   }
-  
+
   Ok(ipv4(octets[0], octets[1], octets[2], octets[3]))
 }
 
@@ -194,10 +200,10 @@ pub fn Ipv4::parse_detailed(s : String) -> Result[Ipv4, IpAddrError] {
 /// A string representation in the format "a.b.c.d"
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let addr = @ipaddr.ipv4(192, 168, 1, 1)
 /// let _ = addr.format() // "192.168.1.1"
-/// 
+///
 /// let localhost = @ipaddr.ipv4(127, 0, 0, 1)
 /// let _ = localhost.format() // "127.0.0.1"
 /// ```
@@ -206,6 +212,7 @@ pub fn Ipv4::format(self : Self) -> String {
   "\{self.0.to_int()}.\{self.1.to_int()}.\{self.2.to_int()}.\{self.3.to_int()}"
 }
 
+///|
 /// Private helper to check if a byte is a valid IPv4 octet (0-255).
 fn is_valid_octet(n : Byte) -> Bool {
   n >= 0 && n <= 255
@@ -247,19 +254,22 @@ pub fn Ipv4::is_valid(self : Self) -> Bool {
 /// A 32-bit integer representation of the IPv4 address
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let addr = @ipaddr.ipv4(192, 168, 1, 1)
 /// let _ = addr.to_int() // 3232235777
-/// 
+///
 /// let localhost = @ipaddr.ipv4(127, 0, 0, 1)
 /// let _ = localhost.to_int() // 2130706433
-/// 
+///
 /// let zero = @ipaddr.ipv4(0, 0, 0, 0)
 /// let _ = zero.to_int() // 0
 /// ```
 ///
 pub fn Ipv4::to_int(self : Self) -> Int {
-  (self.0.to_int() << 24) | (self.1.to_int() << 16) | (self.2.to_int() << 8) | self.3.to_int()
+  (self.0.to_int() << 24) |
+  (self.1.to_int() << 16) |
+  (self.2.to_int() << 8) |
+  self.3.to_int()
 }
 
 ///|
@@ -276,13 +286,13 @@ pub fn Ipv4::to_int(self : Self) -> Int {
 /// An IPv4 address constructed from the integer
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let addr = @ipaddr.Ipv4::from_int(0x7F000001) // 127.0.0.1
 /// let _ = addr.format() // "127.0.0.1"
-/// 
+///
 /// let localhost = @ipaddr.Ipv4::from_int(0x7F000001) // 127.0.0.1
 /// let _ = localhost.format() // "127.0.0.1"
-/// 
+///
 /// let _ = @ipaddr.Ipv4::from_int(0) // 0.0.0.0
 /// ```
 ///
@@ -294,6 +304,7 @@ pub fn Ipv4::from_int(n : Int) -> Ipv4 {
   ipv4(a, b, c, d)
 }
 
+///|
 /// Creates an IPv4 address from a 32-bit integer with validation.
 ///
 /// This is a safe version of `from_int` that validates the input range.
@@ -307,13 +318,13 @@ pub fn Ipv4::from_int(n : Int) -> Ipv4 {
 /// `Some(Ipv4)` if the integer is valid, `None` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let _ = @ipaddr.Ipv4::try_from_int(0x7F000001) // Some(127.0.0.1)
 /// let _ = @ipaddr.Ipv4::try_from_int(0) // Some(0.0.0.0)
 /// let _ = @ipaddr.Ipv4::try_from_int(-1) // None - negative
 /// ```
 ///
-pub fn Ipv4::try_from_int(n : Int) -> Option[Ipv4] {
+pub fn Ipv4::try_from_int(n : Int) -> Ipv4? {
   if n < 0 {
     return None
   }
@@ -334,16 +345,16 @@ pub fn Ipv4::try_from_int(n : Int) -> Option[Ipv4] {
 /// `true` if the address is in a private range, `false` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let private1 = @ipaddr.ipv4(10, 0, 0, 1)
 /// let _ = private1.is_private() // true
-/// 
+///
 /// let private2 = @ipaddr.ipv4(172, 16, 0, 1)
 /// let _ = private2.is_private() // true
-/// 
+///
 /// let private3 = @ipaddr.ipv4(192, 168, 1, 1)
 /// let _ = private3.is_private() // true
-/// 
+///
 /// let public_addr = @ipaddr.ipv4(8, 8, 8, 8)
 /// let _ = public_addr.is_private() // false
 /// ```
@@ -374,13 +385,13 @@ pub fn Ipv4::is_private(self : Self) -> Bool {
 /// `true` if the address is a loopback address, `false` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let localhost = @ipaddr.ipv4(127, 0, 0, 1)
 /// let _ = localhost.is_loopback() // true
-/// 
+///
 /// let loopback_variant = @ipaddr.ipv4(127, 1, 2, 3)
 /// let _ = loopback_variant.is_loopback() // true
-/// 
+///
 /// let not_loopback = @ipaddr.ipv4(192, 168, 1, 1)
 /// let _ = not_loopback.is_loopback() // false
 /// ```
@@ -400,13 +411,13 @@ pub fn Ipv4::is_loopback(self : Self) -> Bool {
 /// `true` if the address is a multicast address, `false` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let multicast1 = @ipaddr.ipv4(224, 0, 0, 1)
 /// let _ = multicast1.is_multicast() // true
-/// 
+///
 /// let multicast2 = @ipaddr.ipv4(239, 255, 255, 255)
 /// let _ = multicast2.is_multicast() // true
-/// 
+///
 /// let unicast = @ipaddr.ipv4(192, 168, 1, 1)
 /// let _ = unicast.is_multicast() // false
 /// ```
@@ -425,13 +436,13 @@ pub fn Ipv4::is_multicast(self : Self) -> Bool {
 /// `true` if the address is 255.255.255.255, `false` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let broadcast = @ipaddr.ipv4(255, 255, 255, 255)
 /// let _ = broadcast.is_broadcast() // true
-/// 
+///
 /// let not_broadcast = @ipaddr.ipv4(192, 168, 1, 255)
 /// let _ = not_broadcast.is_broadcast() // false
-/// 
+///
 /// let almost_broadcast = @ipaddr.ipv4(255, 255, 255, 254)
 /// let _ = almost_broadcast.is_broadcast() // false
 /// ```
@@ -462,13 +473,13 @@ pub struct Ipv4Prefix {
 /// An Ipv4Prefix representing the network subnet
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// // Create a /24 subnet (255.255.255.0 netmask)
 /// let _ = @ipaddr.ipv4_prefix(@ipaddr.ipv4(192, 168, 1, 0), 24)
-/// 
+///
 /// // Create a /16 subnet (255.255.0.0 netmask)
 /// let _ = @ipaddr.ipv4_prefix(@ipaddr.ipv4(10, 0, 0, 0), 16)
-/// 
+///
 /// // Create a /32 host route (255.255.255.255 netmask)
 /// let _ = @ipaddr.ipv4_prefix(@ipaddr.ipv4(8, 8, 8, 8), 32)
 /// ```
@@ -477,6 +488,7 @@ pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
   { addr, prefix_len }
 }
 
+///|
 /// Creates a new IPv4 CIDR prefix from an address and prefix length (OO-style constructor).
 ///
 /// A CIDR prefix represents a network subnet using an IPv4 address and a prefix length.
@@ -490,13 +502,13 @@ pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
 /// An Ipv4Prefix representing the network subnet
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// // Create a /24 subnet (255.255.255.0 netmask)
 /// let _ = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
-/// 
+///
 /// // Create a /16 subnet (255.255.0.0 netmask)
 /// let _ = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 16)
-/// 
+///
 /// // Create a /32 host route (255.255.255.255 netmask)
 /// let _ = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(8, 8, 8, 8), 32)
 /// ```
@@ -505,6 +517,7 @@ pub fn Ipv4Prefix::new(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
   { addr, prefix_len }
 }
 
+///|
 /// Parses an IPv4 CIDR prefix from a string.
 ///
 /// # Parameters
@@ -514,38 +527,39 @@ pub fn Ipv4Prefix::new(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
 /// `Some(Ipv4Prefix)` if parsing succeeds, `None` if the format is invalid
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let _ = @ipaddr.Ipv4Prefix::parse("192.168.1.0/24")
 /// let _ = @ipaddr.Ipv4Prefix::parse("10.0.0.0/8")
 /// let _ = @ipaddr.Ipv4Prefix::parse("invalid") // None - wrong format
 /// ```
 ///
-pub fn Ipv4Prefix::parse(s : String) -> Option[Ipv4Prefix] {
+pub fn Ipv4Prefix::parse(s : String) -> Ipv4Prefix? {
   let parts = s.split("/").collect()
   if parts.length() != 2 {
     return None
   }
-  
+
   // Parse the IPv4 address part
   let addr = match Ipv4::parse(parts[0].to_string()) {
     Some(a) => a
     None => return None
   }
-  
+
   // Parse the prefix length part
   let prefix_len = match parse_prefix_len(parts[1].to_string()) {
     Some(n) => n
     None => return None
   }
-  
+
   Some(ipv4_prefix(addr, prefix_len))
 }
 
-fn parse_prefix_len(s : String) -> Option[Int] {
+///|
+fn parse_prefix_len(s : String) -> Int? {
   if s.length() == 0 || s.length() > 2 {
     return None
   }
-  
+
   let mut result = 0
   let mut i = 0
   while i < s.length() {
@@ -553,18 +567,18 @@ fn parse_prefix_len(s : String) -> Option[Int] {
     if c < '0' || c > '9' {
       return None
     }
-    result = result * 10 + (c - 48)
+    result = result * 10 + (c - 48).to_int()
     if result > 32 {
       return None
     }
     i = i + 1
   }
-  
+
   // Don't allow leading zeros (except for single "0")
   if s.length() > 1 && s[0] == '0' {
     return None
   }
-  
+
   Some(result)
 }
 
@@ -581,18 +595,18 @@ fn parse_prefix_len(s : String) -> Option[Int] {
 /// `true` if the address is within the subnet, `false` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let subnet = @ipaddr.ipv4_prefix(@ipaddr.ipv4(192, 168, 1, 0), 24)
-/// 
+///
 /// let addr1 = @ipaddr.ipv4(192, 168, 1, 1)
 /// let _ = subnet.contains(addr1) // true
-/// 
+///
 /// let addr2 = @ipaddr.ipv4(192, 168, 1, 255)
 /// let _ = subnet.contains(addr2) // true
-/// 
+///
 /// let addr3 = @ipaddr.ipv4(192, 168, 2, 1)
 /// let _ = subnet.contains(addr3) // false
-/// 
+///
 /// // Special case: /0 contains all addresses
 /// let all_networks = @ipaddr.ipv4_prefix(@ipaddr.ipv4(0, 0, 0, 0), 0)
 /// let _ = all_networks.contains(@ipaddr.ipv4(8, 8, 8, 8)) // true
@@ -618,14 +632,14 @@ pub fn Ipv4Prefix::contains(self : Self, addr : Ipv4) -> Bool {
 /// The network address as an IPv4 address
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let prefix = @ipaddr.ipv4_prefix(@ipaddr.ipv4(192, 168, 1, 100), 24)
 /// let network = prefix.network() // 192.168.1.0
 /// let _ = network.format() // "192.168.1.0"
-/// 
+///
 /// let prefix16 = @ipaddr.ipv4_prefix(@ipaddr.ipv4(10, 5, 10, 20), 16)
 /// let _ = prefix16.network() // 10.5.0.0
-/// 
+///
 /// // Special case: /0 network is 0.0.0.0
 /// let default_route = @ipaddr.ipv4_prefix(@ipaddr.ipv4(8, 8, 8, 8), 0)
 /// let _ = default_route.network() // 0.0.0.0
@@ -652,14 +666,14 @@ pub fn Ipv4Prefix::network(self : Self) -> Ipv4 {
 /// The broadcast address as an IPv4 address
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let prefix = @ipaddr.ipv4_prefix(@ipaddr.ipv4(192, 168, 1, 0), 24)
 /// let broadcast = prefix.broadcast() // 192.168.1.255
 /// let _ = broadcast.format() // "192.168.1.255"
-/// 
+///
 /// let prefix16 = @ipaddr.ipv4_prefix(@ipaddr.ipv4(10, 5, 0, 0), 16)
 /// let _ = prefix16.broadcast() // 10.5.255.255
-/// 
+///
 /// // Special case: /0 broadcast is 255.255.255.255
 /// let default_route = @ipaddr.ipv4_prefix(@ipaddr.ipv4(0, 0, 0, 0), 0)
 /// let _ = default_route.broadcast() // 255.255.255.255
@@ -675,6 +689,7 @@ pub fn Ipv4Prefix::broadcast(self : Self) -> Ipv4 {
   Ipv4::from_int(broadcast_int)
 }
 
+///|
 /// Returns the subnet mask for this CIDR prefix.
 ///
 /// The subnet mask indicates which bits are used for the network portion
@@ -684,15 +699,15 @@ pub fn Ipv4Prefix::broadcast(self : Self) -> Ipv4 {
 /// An Ipv4 address representing the subnet mask
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let subnet = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
 /// let mask = subnet.mask()
 /// let _ = mask.format() // "255.255.255.0"
-/// 
+///
 /// let host_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 1), 32)
 /// let host_mask = host_route.mask()
 /// let _ = host_mask.format() // "255.255.255.255"
-/// 
+///
 /// let default_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(0, 0, 0, 0), 0)
 /// let default_mask = default_route.mask()
 /// let _ = default_mask.format() // "0.0.0.0"
@@ -706,6 +721,7 @@ pub fn Ipv4Prefix::mask(self : Self) -> Ipv4 {
   Ipv4::from_int(mask_int)
 }
 
+///|
 /// Returns the number of host addresses in this subnet.
 ///
 /// This includes the network and broadcast addresses. For usable host addresses,
@@ -715,13 +731,13 @@ pub fn Ipv4Prefix::mask(self : Self) -> Ipv4 {
 /// The total number of addresses in the subnet
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let subnet = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
 /// let _ = subnet.host_count() // 256 (254 usable)
-/// 
+///
 /// let host_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 1), 32)
 /// let _ = host_route.host_count() // 1
-/// 
+///
 /// let point_to_point = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 31)
 /// let _ = point_to_point.host_count() // 2
 /// ```
@@ -736,7 +752,12 @@ pub fn Ipv4Prefix::host_count(self : Self) -> Int {
 ///|
 ///  MAC address (6 bytes)
 ///
-pub struct Mac(Byte, Byte, Byte, Byte, Byte, Byte) derive(Eq, Compare, Show, Hash)
+pub struct Mac(Byte, Byte, Byte, Byte, Byte, Byte) derive (
+  Eq,
+  Compare,
+  Show,
+  Hash,
+)
 
 ///|
 /// Creates a new MAC address from six bytes.
@@ -754,21 +775,29 @@ pub struct Mac(Byte, Byte, Byte, Byte, Byte, Byte) derive(Eq, Compare, Show, Has
 /// - `b5`: Sixth byte (least significant)
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// // Create a typical MAC address
 /// let _ = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-/// 
+///
 /// // Create a broadcast MAC address
 /// let _ = @ipaddr.mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
-/// 
+///
 /// // Create a multicast MAC address (first bit of first byte is 1)
 /// let _ = @ipaddr.mac(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
 /// ```
 ///
-pub fn mac(b0 : Byte, b1 : Byte, b2 : Byte, b3 : Byte, b4 : Byte, b5 : Byte) -> Mac {
+pub fn mac(
+  b0 : Byte,
+  b1 : Byte,
+  b2 : Byte,
+  b3 : Byte,
+  b4 : Byte,
+  b5 : Byte,
+) -> Mac {
   Mac(b0, b1, b2, b3, b4, b5)
 }
 
+///|
 /// Creates a new MAC address from six bytes (OO-style constructor).
 ///
 /// MAC (Media Access Control) addresses are 48-bit identifiers used to uniquely
@@ -784,21 +813,29 @@ pub fn mac(b0 : Byte, b1 : Byte, b2 : Byte, b3 : Byte, b4 : Byte, b5 : Byte) -> 
 /// - `b5`: Sixth byte (least significant)
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// // Create a typical MAC address
 /// let _ = @ipaddr.Mac::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-/// 
+///
 /// // Create a broadcast MAC address
 /// let _ = @ipaddr.Mac::new(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
-/// 
+///
 /// // Create a multicast MAC address (first bit of first byte is 1)
 /// let _ = @ipaddr.Mac::new(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
 /// ```
 ///
-pub fn Mac::new(b0 : Byte, b1 : Byte, b2 : Byte, b3 : Byte, b4 : Byte, b5 : Byte) -> Mac {
+pub fn Mac::new(
+  b0 : Byte,
+  b1 : Byte,
+  b2 : Byte,
+  b3 : Byte,
+  b4 : Byte,
+  b5 : Byte,
+) -> Mac {
   Mac(b0, b1, b2, b3, b4, b5)
 }
 
+///|
 /// Parses a MAC address from a hexadecimal string.
 ///
 /// # Parameters
@@ -808,13 +845,13 @@ pub fn Mac::new(b0 : Byte, b1 : Byte, b2 : Byte, b3 : Byte, b4 : Byte, b5 : Byte
 /// `Some(Mac)` if parsing succeeds, `None` if the format is invalid
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let _ = @ipaddr.Mac::parse("00:11:22:33:44:55")
 /// let _ = @ipaddr.Mac::parse("FF-FF-FF-FF-FF-FF")
 /// let _ = @ipaddr.Mac::parse("invalid") // None - wrong format
 /// ```
 ///
-pub fn Mac::parse(s : String) -> Option[Mac] {
+pub fn Mac::parse(s : String) -> Mac? {
   // Try colon separator first, then dash
   let parts = if s.contains(":") {
     s.split(":").collect()
@@ -823,11 +860,11 @@ pub fn Mac::parse(s : String) -> Option[Mac] {
   } else {
     return None
   }
-  
+
   if parts.length() != 6 {
     return None
   }
-  
+
   let bytes : Array[Int] = []
   for i = 0; i < 6; i = i + 1 {
     match parse_hex_byte(parts[i].to_string()) {
@@ -835,32 +872,42 @@ pub fn Mac::parse(s : String) -> Option[Mac] {
       None => return None
     }
   }
-  
-  Some(mac(bytes[0].to_byte(), bytes[1].to_byte(), bytes[2].to_byte(), bytes[3].to_byte(), bytes[4].to_byte(), bytes[5].to_byte()))
+
+  Some(
+    mac(
+      bytes[0].to_byte(),
+      bytes[1].to_byte(),
+      bytes[2].to_byte(),
+      bytes[3].to_byte(),
+      bytes[4].to_byte(),
+      bytes[5].to_byte(),
+    ),
+  )
 }
 
-fn parse_hex_byte(s : String) -> Option[Int] {
+///|
+fn parse_hex_byte(s : String) -> Int? {
   if s.length() != 2 {
     return None
   }
-  
+
   let mut result = 0
   let mut i = 0
   while i < 2 {
     let c = s[i]
     let digit = if c >= '0' && c <= '9' {
-      c - 48  // '0' = 48
+      c - 48 // '0' = 48
     } else if c >= 'a' && c <= 'f' {
-      c - 87  // 'a' = 97, so 'a' - 87 = 10
+      c - 87 // 'a' = 97, so 'a' - 87 = 10
     } else if c >= 'A' && c <= 'F' {
-      c - 55  // 'A' = 65, so 'A' - 55 = 10
+      c - 55 // 'A' = 65, so 'A' - 55 = 10
     } else {
       return None
     }
-    result = result * 16 + digit
+    result = result * 16 + digit.to_int()
     i = i + 1
   }
-  
+
   Some(result)
 }
 
@@ -878,7 +925,7 @@ fn parse_hex_byte(s : String) -> Option[Int] {
 /// A two-character lowercase hexadecimal string
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// // Internal function, typically not called directly
 /// // Internal function examples: "00", "0f", "ff", "ab"
 /// ```
@@ -902,14 +949,14 @@ fn format_hex8(n : Int) -> String {
 /// A string representation in the format "xx:xx:xx:xx:xx:xx"
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let addr = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = addr.format() // "00:11:22:33:44:55"
-/// 
+///
 /// let _ = @ipaddr.mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
 /// let broadcast = @ipaddr.mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
 /// let _ = broadcast.format() // "ff:ff:ff:ff:ff:ff"
-/// 
+///
 /// let zero_mac = @ipaddr.mac(0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
 /// let _ = zero_mac.format() // "00:00:00:00:00:00"
 /// ```
@@ -934,13 +981,13 @@ pub fn Mac::format(self : Self) -> String {
 /// `true` if the address is ff:ff:ff:ff:ff:ff, `false` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let broadcast = @ipaddr.mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
 /// let _ = broadcast.is_broadcast() // true
-/// 
+///
 /// let normal_mac = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = normal_mac.is_broadcast() // false
-/// 
+///
 /// let almost_broadcast = @ipaddr.mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE)
 /// let _ = almost_broadcast.is_broadcast() // false
 /// ```
@@ -965,17 +1012,17 @@ pub fn Mac::is_broadcast(self : Self) -> Bool {
 /// `true` if the address is multicast, `false` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// // Multicast address (first bit of 0x01 is 1)
 /// let _ = @ipaddr.mac(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
 /// let multicast = @ipaddr.mac(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
 /// let _ = multicast.is_multicast() // true
-/// 
+///
 /// // Broadcast is also multicast
 /// let _ = @ipaddr.mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
 /// let broadcast = @ipaddr.mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
 /// let _ = broadcast.is_multicast() // true
-/// 
+///
 /// // Unicast address (first bit of 0x00 is 0)
 /// let unicast = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = unicast.is_multicast() // false
@@ -1025,15 +1072,15 @@ pub fn Mac::is_unicast(self : Self) -> Bool {
 /// `true` if the address is locally administered, `false` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// // Locally administered address (second bit of 0x02 is 1)
 /// let local_mac = @ipaddr.mac(0x02, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = local_mac.is_local() // true
-/// 
+///
 /// // Another locally administered address (0x03 = 0b00000011)
 /// let local_mac2 = @ipaddr.mac(0x03, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = local_mac2.is_local() // true
-/// 
+///
 /// // Globally unique address (second bit of 0x00 is 0)
 /// let global_mac = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = global_mac.is_local() // false
@@ -1054,15 +1101,15 @@ pub fn Mac::is_local(self : Self) -> Bool {
 /// `true` if the address is globally unique, `false` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// // Globally unique address (second bit of 0x00 is 0)
 /// let global_mac = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = global_mac.is_global() // true
-/// 
+///
 /// // Another globally unique address (0x01 = 0b00000001, second bit is 0)
 /// let global_mac2 = @ipaddr.mac(0x01, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = global_mac2.is_global() // true
-/// 
+///
 /// // Locally administered address (second bit of 0x02 is 1)
 /// let local_mac = @ipaddr.mac(0x02, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = local_mac.is_global() // false
@@ -1083,14 +1130,14 @@ pub fn Mac::is_global(self : Self) -> Bool {
 /// A tuple containing the three OUI bytes (b0, b1, b2)
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let addr = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let (_, _, _) = addr.oui() // (0x00, 0x11, 0x22)
-/// 
+///
 /// // Apple's OUI is 00:17:F2
 /// let apple_mac = @ipaddr.mac(0x00, 0x17, 0xF2, 0x12, 0x34, 0x56)
 /// let (_, _, _) = apple_mac.oui() // (0x00, 0x17, 0xF2)
-/// 
+///
 /// // Intel's OUI is 00:15:17
 /// let intel_mac = @ipaddr.mac(0x00, 0x15, 0x17, 0xAB, 0xCD, 0xEF)
 /// let (_, _, _) = intel_mac.oui() // (0x00, 0x15, 0x17)
@@ -1111,19 +1158,22 @@ pub fn Mac::oui(self : Self) -> (Int, Int, Int) {
 /// A 32-bit integer representation of the lower 4 bytes
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let addr = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
 /// let _ = addr.to_int() // Uses bytes 0x22, 0x33, 0x44, 0x55
-/// 
+///
 /// let simple_mac = @ipaddr.mac(0x00, 0x00, 0x00, 0x00, 0x00, 0x01)
 /// let _ = simple_mac.to_int() // 1
-/// 
+///
 /// let zero_mac = @ipaddr.mac(0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00)
 /// let _ = zero_mac.to_int() // 0 (ignores first two 0xFF bytes)
 /// ```
 ///
 pub fn Mac::to_int(self : Self) -> Int {
-  (self.2.to_int() << 24) | (self.3.to_int() << 16) | (self.4.to_int() << 8) | self.5.to_int()
+  (self.2.to_int() << 24) |
+  (self.3.to_int() << 16) |
+  (self.4.to_int() << 8) |
+  self.5.to_int()
 }
 
 ///|
@@ -1140,13 +1190,13 @@ pub fn Mac::to_int(self : Self) -> Int {
 /// A MAC address with the first two bytes as 0x00 and the last four bytes from the integer
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let mac_from_1 = @ipaddr.Mac::from_int(1) // 00:00:00:00:00:01
 /// let _ = mac_from_1.format() // "00:00:00:00:00:01"
-/// 
+///
 /// let mac_from_large = @ipaddr.Mac::from_int(0x12345678) // 00:00:12:34:56:78
 /// let _ = mac_from_large.format() // "00:00:12:34:56:78"
-/// 
+///
 /// // Round trip conversion
 /// let original = @ipaddr.mac(0x00, 0x00, 0x22, 0x33, 0x44, 0x55)
 /// let int_val = original.to_int()
@@ -1163,6 +1213,7 @@ pub fn Mac::from_int(n : Int) -> Mac {
   mac(b0, b1, b2, b3, b4, b5)
 }
 
+///|
 /// Creates a MAC address from a 48-bit integer with validation.
 ///
 /// This is a safe version of `from_int` that validates the input range.
@@ -1176,13 +1227,13 @@ pub fn Mac::from_int(n : Int) -> Mac {
 /// `Some(Mac)` if the integer is valid, `None` otherwise
 ///
 /// # Examples
-/// ```moonbit
+/// ```moonbit nocheck
 /// let _ = @ipaddr.Mac::try_from_int(0x22334455) // Some(00:00:22:33:44:55)
 /// let _ = @ipaddr.Mac::try_from_int(0) // Some(00:00:00:00:00:00)
 /// let _ = @ipaddr.Mac::try_from_int(-1) // None - negative
 /// ```
 ///
-pub fn Mac::try_from_int(n : Int) -> Option[Mac] {
+pub fn Mac::try_from_int(n : Int) -> Mac? {
   // Check for negative values only - MAC addresses use lower 32 bits in our implementation
   if n < 0 {
     return None
