@@ -15,7 +15,7 @@ A MoonBit library for manipulation of IP (IPv4/IPv6) and MAC address representat
 
 ## Usage
 
-```moonbit nocheck
+```moonbit check
 ///|
 test "readme_examples" {
   // IPv4 addresses
@@ -28,7 +28,7 @@ test "readme_examples" {
   // IPv4 CIDR prefixes
   let prefix = @ipaddr.ipv4_prefix(@ipaddr.ipv4(192, 168, 1, 0), 24)
   let contains = prefix.contains(addr)
-  if not(contains) {
+  if !contains {
     fail("Address should be contained in prefix")
   }
 
