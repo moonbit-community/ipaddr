@@ -24,7 +24,7 @@ test "ipv4_formatting" {
   if formatted != "192.168.1.1" {
     fail("IPv4 formatting failed")
   }
-  
+
   // Note: Show trait produces struct representation, format() produces human-readable
   // Both serve different purposes - Show for debugging, format for display
   // This is actually the correct design - keep both methods
@@ -34,10 +34,10 @@ test "ipv4_formatting" {
 test "ipv4_validation" {
   let valid_addr = @ipaddr.ipv4(192, 168, 1, 1)
   let invalid_addr = @ipaddr.ipv4(255, 168, 1, 1)
-  if not(valid_addr.is_valid()) {
+  if !valid_addr.is_valid() {
     fail("Valid IPv4 should be valid")
   }
-  if not(invalid_addr.is_valid()) {
+  if !invalid_addr.is_valid() {
     fail("Valid IPv4 should be valid")
   }
 }
@@ -64,13 +64,13 @@ test "ipv4_int_conversion" {
 ///|
 test "ipv4_classification" {
   // Private addresses
-  if not(@ipaddr.ipv4(10, 0, 0, 1).is_private()) {
+  if !@ipaddr.ipv4(10, 0, 0, 1).is_private() {
     fail("10.0.0.1 should be private")
   }
-  if not(@ipaddr.ipv4(172, 16, 0, 1).is_private()) {
+  if !@ipaddr.ipv4(172, 16, 0, 1).is_private() {
     fail("172.16.0.1 should be private")
   }
-  if not(@ipaddr.ipv4(192, 168, 1, 1).is_private()) {
+  if !@ipaddr.ipv4(192, 168, 1, 1).is_private() {
     fail("192.168.1.1 should be private")
   }
   if @ipaddr.ipv4(8, 8, 8, 8).is_private() {
@@ -78,7 +78,7 @@ test "ipv4_classification" {
   }
 
   // Loopback
-  if not(@ipaddr.ipv4(127, 0, 0, 1).is_loopback()) {
+  if !@ipaddr.ipv4(127, 0, 0, 1).is_loopback() {
     fail("127.0.0.1 should be loopback")
   }
   if @ipaddr.ipv4(192, 168, 1, 1).is_loopback() {
@@ -86,7 +86,7 @@ test "ipv4_classification" {
   }
 
   // Multicast
-  if not(@ipaddr.ipv4(224, 0, 0, 1).is_multicast()) {
+  if !@ipaddr.ipv4(224, 0, 0, 1).is_multicast() {
     fail("224.0.0.1 should be multicast")
   }
   if @ipaddr.ipv4(192, 168, 1, 1).is_multicast() {
@@ -94,7 +94,7 @@ test "ipv4_classification" {
   }
 
   // Broadcast
-  if not(@ipaddr.ipv4(255, 255, 255, 255).is_broadcast()) {
+  if !@ipaddr.ipv4(255, 255, 255, 255).is_broadcast() {
     fail("255.255.255.255 should be broadcast")
   }
   if @ipaddr.ipv4(192, 168, 1, 255).is_broadcast() {
@@ -108,10 +108,10 @@ test "ipv4_prefix_operations" {
   let addr1 = @ipaddr.ipv4(192, 168, 1, 1)
   let addr2 = @ipaddr.ipv4(192, 168, 1, 255)
   let addr3 = @ipaddr.ipv4(192, 168, 2, 1)
-  if not(prefix.contains(addr1)) {
+  if !prefix.contains(addr1) {
     fail("192.168.1.1 should be in 192.168.1.0/24")
   }
-  if not(prefix.contains(addr2)) {
+  if !prefix.contains(addr2) {
     fail("192.168.1.255 should be in 192.168.1.0/24")
   }
   if prefix.contains(addr3) {
@@ -157,13 +157,13 @@ test "mac_formatting" {
 test "mac_classification" {
   // Broadcast
   let broadcast = @ipaddr.mac(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)
-  if not(broadcast.is_broadcast()) {
+  if !broadcast.is_broadcast() {
     fail("ff:ff:ff:ff:ff:ff should be broadcast")
   }
 
   // Multicast (first bit set)
   let multicast = @ipaddr.mac(0x01, 0x00, 0x5E, 0x00, 0x00, 0x01)
-  if not(multicast.is_multicast()) {
+  if !multicast.is_multicast() {
     fail("01:00:5e:00:00:01 should be multicast")
   }
   if multicast.is_unicast() {
@@ -172,7 +172,7 @@ test "mac_classification" {
 
   // Unicast (first bit clear)
   let unicast = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-  if not(unicast.is_unicast()) {
+  if !unicast.is_unicast() {
     fail("00:11:22:33:44:55 should be unicast")
   }
   if unicast.is_multicast() {
@@ -181,7 +181,7 @@ test "mac_classification" {
 
   // Local (second bit set)
   let local_mac = @ipaddr.mac(0x02, 0x11, 0x22, 0x33, 0x44, 0x55)
-  if not(local_mac.is_local()) {
+  if !local_mac.is_local() {
     fail("02:11:22:33:44:55 should be local")
   }
   if local_mac.is_global() {
@@ -190,7 +190,7 @@ test "mac_classification" {
 
   // Global (second bit clear)
   let global = @ipaddr.mac(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-  if not(global.is_global()) {
+  if !global.is_global() {
     fail("00:11:22:33:44:55 should be global")
   }
   if global.is_local() {
@@ -244,16 +244,16 @@ test "ipv4_prefix_zero_length" {
   let test_addr2 = @ipaddr.ipv4(10, 0, 0, 1)
   let test_addr3 = @ipaddr.ipv4(127, 0, 0, 1)
   let test_addr4 = @ipaddr.ipv4(255, 255, 255, 255)
-  if not(default_route.contains(test_addr1)) {
+  if !default_route.contains(test_addr1) {
     fail("/0 prefix should contain 192.168.1.1")
   }
-  if not(default_route.contains(test_addr2)) {
+  if !default_route.contains(test_addr2) {
     fail("/0 prefix should contain 10.0.0.1")
   }
-  if not(default_route.contains(test_addr3)) {
+  if !default_route.contains(test_addr3) {
     fail("/0 prefix should contain 127.0.0.1")
   }
-  if not(default_route.contains(test_addr4)) {
+  if !default_route.contains(test_addr4) {
     fail("/0 prefix should contain 255.255.255.255")
   }
 
@@ -284,7 +284,10 @@ test "oo_style_constructors" {
 
   // Test Ipv4Prefix::new constructor
   let prefix_old = @ipaddr.ipv4_prefix(@ipaddr.ipv4(192, 168, 1, 0), 24)
-  let prefix_new = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+  let prefix_new = @ipaddr.Ipv4Prefix::new(
+    @ipaddr.Ipv4::new(192, 168, 1, 0),
+    24,
+  )
   let test_addr = @ipaddr.ipv4(192, 168, 1, 100)
   if prefix_old.contains(test_addr) != prefix_new.contains(test_addr) {
     fail("Ipv4Prefix::new should produce same result as ipv4_prefix")
@@ -302,21 +305,19 @@ test "oo_style_constructors" {
 test "ipv4_parsing" {
   // Test valid parsing
   match @ipaddr.Ipv4::parse("192.168.1.1") {
-    Some(addr) => {
+    Some(addr) =>
       if addr.format() != "192.168.1.1" {
         fail("Parsed address should format correctly")
       }
-    }
     None => fail("Valid IPv4 string should parse successfully")
   }
 
   // Test localhost
   match @ipaddr.Ipv4::parse("127.0.0.1") {
-    Some(addr) => {
-      if not(addr.is_loopback()) {
+    Some(addr) =>
+      if !addr.is_loopback() {
         fail("127.0.0.1 should be loopback")
       }
-    }
     None => fail("127.0.0.1 should parse successfully")
   }
 
@@ -348,21 +349,19 @@ test "ipv4_parsing" {
 test "mac_parsing" {
   // Test valid parsing with colon separator
   match @ipaddr.Mac::parse("00:11:22:33:44:55") {
-    Some(mac) => {
+    Some(mac) =>
       if mac.format() != "00:11:22:33:44:55" {
         fail("Parsed MAC should format correctly")
       }
-    }
     None => fail("Valid MAC string should parse successfully")
   }
 
   // Test valid parsing with dash separator
   match @ipaddr.Mac::parse("FF-FF-FF-FF-FF-FF") {
-    Some(mac) => {
-      if not(mac.is_broadcast()) {
+    Some(mac) =>
+      if !mac.is_broadcast() {
         fail("FF-FF-FF-FF-FF-FF should be broadcast")
       }
-    }
     None => fail("Valid MAC string with dashes should parse successfully")
   }
 
@@ -382,14 +381,13 @@ test "mac_parsing" {
   if @ipaddr.Mac::parse("0:11:22:33:44:55") != None {
     fail("Single hex digit should return None")
   }
-  
+
   // Test lowercase hex parsing
   match @ipaddr.Mac::parse("aa:bb:cc:dd:ee:ff") {
-    Some(mac) => {
+    Some(mac) =>
       if mac.format() != "aa:bb:cc:dd:ee:ff" {
         fail("Lowercase hex should parse correctly")
       }
-    }
     None => fail("Lowercase hex should parse successfully")
   }
 }
@@ -400,7 +398,7 @@ test "ipv4_prefix_parsing" {
   match @ipaddr.Ipv4Prefix::parse("192.168.1.0/24") {
     Some(prefix) => {
       let test_addr = @ipaddr.ipv4(192, 168, 1, 100)
-      if not(prefix.contains(test_addr)) {
+      if !prefix.contains(test_addr) {
         fail("192.168.1.100 should be in 192.168.1.0/24")
       }
     }
@@ -411,7 +409,7 @@ test "ipv4_prefix_parsing" {
   match @ipaddr.Ipv4Prefix::parse("0.0.0.0/0") {
     Some(prefix) => {
       let any_addr = @ipaddr.ipv4(8, 8, 8, 8)
-      if not(prefix.contains(any_addr)) {
+      if !prefix.contains(any_addr) {
         fail("0.0.0.0/0 should contain any address")
       }
     }
@@ -423,7 +421,7 @@ test "ipv4_prefix_parsing" {
     Some(prefix) => {
       let localhost = @ipaddr.ipv4(127, 0, 0, 1)
       let other = @ipaddr.ipv4(127, 0, 0, 2)
-      if not(prefix.contains(localhost)) {
+      if !prefix.contains(localhost) {
         fail("127.0.0.1/32 should contain 127.0.0.1")
       }
       if prefix.contains(other) {
@@ -464,31 +462,28 @@ test "ipv4_prefix_parsing" {
 test "try_from_int_functions" {
   // Test Ipv4::try_from_int
   match @ipaddr.Ipv4::try_from_int(0x7F000001) {
-    Some(addr) => {
+    Some(addr) =>
       if addr.format() != "127.0.0.1" {
         fail("try_from_int should create correct IPv4")
       }
-    }
     None => fail("Valid IPv4 integer should succeed")
   }
 
   // Test valid edge cases
   match @ipaddr.Ipv4::try_from_int(0) {
-    Some(addr) => {
+    Some(addr) =>
       if addr.format() != "0.0.0.0" {
         fail("Zero should create 0.0.0.0")
       }
-    }
     None => fail("Zero should be valid")
   }
 
   // Test with a positive 32-bit value
   match @ipaddr.Ipv4::try_from_int(0x08080808) { // 8.8.8.8
-    Some(addr) => {
+    Some(addr) =>
       if addr.format() != "8.8.8.8" {
         fail("Positive value should create correct IPv4, got: " + addr.format())
       }
-    }
     None => fail("Positive 32-bit value should be valid")
   }
 
@@ -499,20 +494,18 @@ test "try_from_int_functions" {
 
   // Test Mac::try_from_int
   match @ipaddr.Mac::try_from_int(0x22334455) {
-    Some(mac) => {
+    Some(mac) =>
       if mac.format() != "00:00:22:33:44:55" {
         fail("try_from_int should create correct MAC")
       }
-    }
     None => fail("Valid MAC integer should succeed")
   }
 
   match @ipaddr.Mac::try_from_int(0) {
-    Some(mac) => {
+    Some(mac) =>
       if mac.format() != "00:00:00:00:00:00" {
         fail("Zero should create null MAC")
       }
-    }
     None => fail("Zero should be valid for MAC")
   }
 
@@ -565,7 +558,10 @@ test "ipv4_prefix_utilities" {
     fail("/32 should have 1 host, got: " + count32.to_string())
   }
 
-  let point_to_point = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 31)
+  let point_to_point = @ipaddr.Ipv4Prefix::new(
+    @ipaddr.Ipv4::new(10, 0, 0, 0),
+    31,
+  )
   let count31 = point_to_point.host_count()
   if count31 != 2 {
     fail("/31 should have 2 hosts, got: " + count31.to_string())
@@ -582,11 +578,10 @@ test "ipv4_prefix_utilities" {
 test "error_based_parsing" {
   // Test successful parsing
   match @ipaddr.Ipv4::parse_detailed("192.168.1.1") {
-    Ok(addr) => {
+    Ok(addr) =>
       if addr.format() != "192.168.1.1" {
         fail("Detailed parsing should work correctly")
       }
-    }
     Err(_) => fail("Valid IPv4 string should parse successfully")
   }
 
@@ -600,11 +595,10 @@ test "error_based_parsing" {
   // Test invalid octet errors
   match @ipaddr.Ipv4::parse_detailed("256.1.1.1") {
     Ok(_) => fail("Out of range octet should return error")
-    Err(InvalidOctet(n)) => {
+    Err(InvalidOctet(n)) =>
       if n != 256 {
         fail("Should return InvalidOctet(256), got: " + n.to_string())
       }
-    }
     Err(_) => fail("Should return InvalidOctet error")
   }
 
@@ -643,39 +637,39 @@ test "hash_trait_functionality" {
   let addr1 = @ipaddr.Ipv4::new(192, 168, 1, 1)
   let addr2 = @ipaddr.Ipv4::new(192, 168, 1, 1)
   let addr3 = @ipaddr.Ipv4::new(192, 168, 1, 2)
-  
+
   // Equal addresses should have equal hashes
   if addr1 != addr2 {
     fail("Equal IPv4 addresses should be equal")
   }
-  
+
   // Different addresses should not be equal
   if addr1 == addr3 {
     fail("Different IPv4 addresses should not be equal")
   }
-  
+
   // Test with MAC addresses
   let mac1 = @ipaddr.Mac::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
   let mac2 = @ipaddr.Mac::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
   let mac3 = @ipaddr.Mac::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x56)
-  
+
   if mac1 != mac2 {
     fail("Equal MAC addresses should be equal")
   }
-  
+
   if mac1 == mac3 {
     fail("Different MAC addresses should not be equal")
   }
-  
+
   // Test with prefixes
   let prefix1 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
   let prefix2 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
   let prefix3 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 25)
-  
+
   if prefix1 != prefix2 {
     fail("Equal prefixes should be equal")
   }
-  
+
   if prefix1 == prefix3 {
     fail("Different prefixes should not be equal")
   }

@@ -8,13 +8,10 @@
 pub enum IpAddrError {
   InvalidFormat
   InvalidOctet(Int)
-  InvalidPrefixLength(Int)
-  InvalidHexByte(String)
-  OutOfRange
-} derive(Eq, Show, Hash)
+} derive(Eq, Debug, Hash)
 
 ///|
-pub struct Ipv4(Byte, Byte, Byte, Byte) derive(Eq, Compare, Show, Hash)
+pub struct Ipv4(Byte, Byte, Byte, Byte) derive(Eq, Compare, Debug, Hash)
 
 ///|
 /// Creates a new IPv4 address from four octets.
@@ -457,7 +454,7 @@ pub fn Ipv4::is_broadcast(self : Self) -> Bool {
 pub struct Ipv4Prefix {
   addr : Ipv4
   prefix_len : Int
-} derive(Eq, Compare, Show, Hash)
+} derive(Eq, Compare, Debug, Hash)
 
 ///|
 /// Creates a new IPv4 CIDR prefix from an address and prefix length.
@@ -755,7 +752,7 @@ pub fn Ipv4Prefix::host_count(self : Self) -> Int {
 pub struct Mac(Byte, Byte, Byte, Byte, Byte, Byte) derive (
   Eq,
   Compare,
-  Show,
+  Debug,
   Hash,
 )
 
@@ -1239,4 +1236,24 @@ pub fn Mac::try_from_int(n : Int) -> Mac? {
     return None
   }
   Some(Mac::from_int(n))
+}
+
+///|
+pub impl Show for IpAddrError with output(self, logger) {
+  logger.write_string(@debug.render(self.to_repr(), max_depth=2147483647))
+}
+
+///|
+pub impl Show for Ipv4 with output(self, logger) {
+  logger.write_string(@debug.render(self.to_repr(), max_depth=2147483647))
+}
+
+///|
+pub impl Show for Ipv4Prefix with output(self, logger) {
+  logger.write_string(@debug.render(self.to_repr(), max_depth=2147483647))
+}
+
+///|
+pub impl Show for Mac with output(self, logger) {
+  logger.write_string(@debug.render(self.to_repr(), max_depth=2147483647))
 }

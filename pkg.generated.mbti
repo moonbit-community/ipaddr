@@ -1,12 +1,16 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "bobzhang/ipaddr"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
-fn ipv4(Byte, Byte, Byte, Byte) -> Ipv4
+pub fn ipv4(Byte, Byte, Byte, Byte) -> Ipv4
 
-fn ipv4_prefix(Ipv4, Int) -> Ipv4Prefix
+pub fn ipv4_prefix(Ipv4, Int) -> Ipv4Prefix
 
-fn mac(Byte, Byte, Byte, Byte, Byte, Byte) -> Mac
+pub fn mac(Byte, Byte, Byte, Byte, Byte, Byte) -> Mac
 
 // Errors
 
@@ -14,67 +18,51 @@ fn mac(Byte, Byte, Byte, Byte, Byte, Byte) -> Mac
 pub enum IpAddrError {
   InvalidFormat
   InvalidOctet(Int)
-  InvalidPrefixLength(Int)
-  InvalidHexByte(String)
-  OutOfRange
-}
-impl Eq for IpAddrError
-impl Hash for IpAddrError
-impl Show for IpAddrError
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for IpAddrError
 
-pub struct Ipv4(Byte, Byte, Byte, Byte)
-
-fn Ipv4::format(Self) -> String
-fn Ipv4::from_int(Int) -> Self
-fn Ipv4::is_broadcast(Self) -> Bool
-fn Ipv4::is_loopback(Self) -> Bool
-fn Ipv4::is_multicast(Self) -> Bool
-fn Ipv4::is_private(Self) -> Bool
-fn Ipv4::is_valid(Self) -> Bool
-fn Ipv4::new(Byte, Byte, Byte, Byte) -> Self
-fn Ipv4::parse(String) -> Self?
-fn Ipv4::parse_detailed(String) -> Result[Self, IpAddrError]
-fn Ipv4::to_int(Self) -> Int
-fn Ipv4::try_from_int(Int) -> Self?
-impl Compare for Ipv4
-impl Eq for Ipv4
-impl Hash for Ipv4
-impl Show for Ipv4
+pub struct Ipv4(Byte, Byte, Byte, Byte) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Ipv4::format(Self) -> String
+pub fn Ipv4::from_int(Int) -> Self
+pub fn Ipv4::is_broadcast(Self) -> Bool
+pub fn Ipv4::is_loopback(Self) -> Bool
+pub fn Ipv4::is_multicast(Self) -> Bool
+pub fn Ipv4::is_private(Self) -> Bool
+pub fn Ipv4::is_valid(Self) -> Bool
+pub fn Ipv4::new(Byte, Byte, Byte, Byte) -> Self
+pub fn Ipv4::parse(String) -> Self?
+pub fn Ipv4::parse_detailed(String) -> Result[Self, IpAddrError]
+pub fn Ipv4::to_int(Self) -> Int
+pub fn Ipv4::try_from_int(Int) -> Self?
+pub impl Show for Ipv4
 
 pub struct Ipv4Prefix {
   addr : Ipv4
   prefix_len : Int
-}
-fn Ipv4Prefix::broadcast(Self) -> Ipv4
-fn Ipv4Prefix::contains(Self, Ipv4) -> Bool
-fn Ipv4Prefix::host_count(Self) -> Int
-fn Ipv4Prefix::mask(Self) -> Ipv4
-fn Ipv4Prefix::network(Self) -> Ipv4
-fn Ipv4Prefix::new(Ipv4, Int) -> Self
-fn Ipv4Prefix::parse(String) -> Self?
-impl Compare for Ipv4Prefix
-impl Eq for Ipv4Prefix
-impl Hash for Ipv4Prefix
-impl Show for Ipv4Prefix
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Ipv4Prefix::broadcast(Self) -> Ipv4
+pub fn Ipv4Prefix::contains(Self, Ipv4) -> Bool
+pub fn Ipv4Prefix::host_count(Self) -> Int
+pub fn Ipv4Prefix::mask(Self) -> Ipv4
+pub fn Ipv4Prefix::network(Self) -> Ipv4
+pub fn Ipv4Prefix::new(Ipv4, Int) -> Self
+pub fn Ipv4Prefix::parse(String) -> Self?
+pub impl Show for Ipv4Prefix
 
-pub struct Mac(Byte, Byte, Byte, Byte, Byte, Byte)
-
-fn Mac::format(Self) -> String
-fn Mac::from_int(Int) -> Self
-fn Mac::is_broadcast(Self) -> Bool
-fn Mac::is_global(Self) -> Bool
-fn Mac::is_local(Self) -> Bool
-fn Mac::is_multicast(Self) -> Bool
-fn Mac::is_unicast(Self) -> Bool
-fn Mac::new(Byte, Byte, Byte, Byte, Byte, Byte) -> Self
-fn Mac::oui(Self) -> (Int, Int, Int)
-fn Mac::parse(String) -> Self?
-fn Mac::to_int(Self) -> Int
-fn Mac::try_from_int(Int) -> Self?
-impl Compare for Mac
-impl Eq for Mac
-impl Hash for Mac
-impl Show for Mac
+pub struct Mac(Byte, Byte, Byte, Byte, Byte, Byte) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Mac::format(Self) -> String
+pub fn Mac::from_int(Int) -> Self
+pub fn Mac::is_broadcast(Self) -> Bool
+pub fn Mac::is_global(Self) -> Bool
+pub fn Mac::is_local(Self) -> Bool
+pub fn Mac::is_multicast(Self) -> Bool
+pub fn Mac::is_unicast(Self) -> Bool
+pub fn Mac::new(Byte, Byte, Byte, Byte, Byte, Byte) -> Self
+pub fn Mac::oui(Self) -> (Int, Int, Int)
+pub fn Mac::parse(String) -> Self?
+pub fn Mac::to_int(Self) -> Int
+pub fn Mac::try_from_int(Int) -> Self?
+pub impl Show for Mac
 
 // Type aliases
 
