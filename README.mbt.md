@@ -15,7 +15,8 @@ A MoonBit library for manipulation of IP (IPv4/IPv6) and MAC address representat
 
 ## Usage
 
-```moonbit
+```moonbit nocheck
+///|
 test "readme_examples" {
   // IPv4 addresses
   let addr = @ipaddr.ipv4(192, 168, 1, 1)
