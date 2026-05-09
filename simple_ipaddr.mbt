@@ -145,7 +145,7 @@ pub fn Ipv4::parse(s : String) -> Ipv4? {
 
   let octets : Array[Byte] = []
   for i = 0; i < 4; i = i + 1 {
-    match parse_octet(parts[i].to_string()) {
+    match parse_octet(parts[i].to_owned()) {
       Some(n) => octets.push(n)
       None => return None
     }
@@ -181,7 +181,7 @@ pub fn Ipv4::parse_detailed(s : String) -> Result[Ipv4, IpAddrError] {
 
   let octets : Array[Byte] = []
   for i = 0; i < 4; i = i + 1 {
-    match parse_octet_detailed(parts[i].to_string()) {
+    match parse_octet_detailed(parts[i].to_owned()) {
       Ok(n) => octets.push(n)
       Err(e) => return Err(e)
     }
@@ -537,13 +537,13 @@ pub fn Ipv4Prefix::parse(s : String) -> Ipv4Prefix? {
   }
 
   // Parse the IPv4 address part
-  let addr = match Ipv4::parse(parts[0].to_string()) {
+  let addr = match Ipv4::parse(parts[0].to_owned()) {
     Some(a) => a
     None => return None
   }
 
   // Parse the prefix length part
-  let prefix_len = match parse_prefix_len(parts[1].to_string()) {
+  let prefix_len = match parse_prefix_len(parts[1].to_owned()) {
     Some(n) => n
     None => return None
   }
@@ -864,7 +864,7 @@ pub fn Mac::parse(s : String) -> Mac? {
 
   let bytes : Array[Int] = []
   for i = 0; i < 6; i = i + 1 {
-    match parse_hex_byte(parts[i].to_string()) {
+    match parse_hex_byte(parts[i].to_owned()) {
       Some(n) => bytes.push(n)
       None => return None
     }
