@@ -19,20 +19,39 @@ pub enum IpAddrError {
   InvalidFormat
   InvalidOctet(Int)
 } derive(Eq, Hash, @debug.Debug)
+pub fn IpAddrError::equal(Self, Self) -> Bool
+pub fn IpAddrError::hash(Self) -> Int
+pub fn IpAddrError::hash_combine(Self, Hasher) -> Unit
+pub fn IpAddrError::not_equal(Self, Self) -> Bool
+pub fn IpAddrError::output(Self, &Logger) -> Unit
+pub fn IpAddrError::to_repr(Self) -> @debug.Repr
+pub fn IpAddrError::to_string(Self) -> String
 pub impl Show for IpAddrError
 
 pub struct Ipv4(Byte, Byte, Byte, Byte) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Ipv4::compare(Self, Self) -> Int
+pub fn Ipv4::equal(Self, Self) -> Bool
 pub fn Ipv4::format(Self) -> String
 pub fn Ipv4::from_int(Int) -> Self
+pub fn Ipv4::hash(Self) -> Int
+pub fn Ipv4::hash_combine(Self, Hasher) -> Unit
 pub fn Ipv4::is_broadcast(Self) -> Bool
 pub fn Ipv4::is_loopback(Self) -> Bool
 pub fn Ipv4::is_multicast(Self) -> Bool
 pub fn Ipv4::is_private(Self) -> Bool
 pub fn Ipv4::is_valid(Self) -> Bool
 pub fn Ipv4::new(Byte, Byte, Byte, Byte) -> Self
+pub fn Ipv4::not_equal(Self, Self) -> Bool
+pub fn Ipv4::op_ge(Self, Self) -> Bool
+pub fn Ipv4::op_gt(Self, Self) -> Bool
+pub fn Ipv4::op_le(Self, Self) -> Bool
+pub fn Ipv4::op_lt(Self, Self) -> Bool
+pub fn Ipv4::output(Self, &Logger) -> Unit
 pub fn Ipv4::parse(String) -> Self?
 pub fn Ipv4::parse_detailed(String) -> Result[Self, IpAddrError]
 pub fn Ipv4::to_int(Self) -> Int
+pub fn Ipv4::to_repr(Self) -> @debug.Repr
+pub fn Ipv4::to_string(Self) -> String
 pub fn Ipv4::try_from_int(Int) -> Self?
 pub impl Show for Ipv4
 
@@ -41,30 +60,53 @@ pub struct Ipv4Prefix {
   prefix_len : Int
 } derive(Compare, Eq, Hash, @debug.Debug)
 pub fn Ipv4Prefix::broadcast(Self) -> Ipv4
+pub fn Ipv4Prefix::compare(Self, Self) -> Int
 pub fn Ipv4Prefix::contains(Self, Ipv4) -> Bool
+pub fn Ipv4Prefix::equal(Self, Self) -> Bool
+pub fn Ipv4Prefix::hash(Self) -> Int
+pub fn Ipv4Prefix::hash_combine(Self, Hasher) -> Unit
 pub fn Ipv4Prefix::host_count(Self) -> Int
 pub fn Ipv4Prefix::mask(Self) -> Ipv4
 pub fn Ipv4Prefix::network(Self) -> Ipv4
 pub fn Ipv4Prefix::new(Ipv4, Int) -> Self
+pub fn Ipv4Prefix::not_equal(Self, Self) -> Bool
+pub fn Ipv4Prefix::op_ge(Self, Self) -> Bool
+pub fn Ipv4Prefix::op_gt(Self, Self) -> Bool
+pub fn Ipv4Prefix::op_le(Self, Self) -> Bool
+pub fn Ipv4Prefix::op_lt(Self, Self) -> Bool
+pub fn Ipv4Prefix::output(Self, &Logger) -> Unit
 pub fn Ipv4Prefix::parse(String) -> Self?
+pub fn Ipv4Prefix::to_repr(Self) -> @debug.Repr
+pub fn Ipv4Prefix::to_string(Self) -> String
 pub impl Show for Ipv4Prefix
 
 pub struct Mac(Byte, Byte, Byte, Byte, Byte, Byte) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Mac::compare(Self, Self) -> Int
+pub fn Mac::equal(Self, Self) -> Bool
 pub fn Mac::format(Self) -> String
 pub fn Mac::from_int(Int) -> Self
+pub fn Mac::hash(Self) -> Int
+pub fn Mac::hash_combine(Self, Hasher) -> Unit
 pub fn Mac::is_broadcast(Self) -> Bool
 pub fn Mac::is_global(Self) -> Bool
 pub fn Mac::is_local(Self) -> Bool
 pub fn Mac::is_multicast(Self) -> Bool
 pub fn Mac::is_unicast(Self) -> Bool
 pub fn Mac::new(Byte, Byte, Byte, Byte, Byte, Byte) -> Self
+pub fn Mac::not_equal(Self, Self) -> Bool
+pub fn Mac::op_ge(Self, Self) -> Bool
+pub fn Mac::op_gt(Self, Self) -> Bool
+pub fn Mac::op_le(Self, Self) -> Bool
+pub fn Mac::op_lt(Self, Self) -> Bool
 pub fn Mac::oui(Self) -> (Int, Int, Int)
+pub fn Mac::output(Self, &Logger) -> Unit
 pub fn Mac::parse(String) -> Self?
 pub fn Mac::to_int(Self) -> Int
+pub fn Mac::to_repr(Self) -> @debug.Repr
+pub fn Mac::to_string(Self) -> String
 pub fn Mac::try_from_int(Int) -> Self?
 pub impl Show for Mac
 
 // Type aliases
 
 // Traits
-
