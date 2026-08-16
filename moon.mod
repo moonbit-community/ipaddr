@@ -1,0 +1,17 @@
+name = "bobzhang/ipaddr"
+
+version = "0.1.1"
+
+readme = "README.md"
+
+repository = "https://github.com/bobzhang/ipaddr"
+
+license = "ISC"
+
+keywords = [ "ip", "ipv4", "ipv6", "mac", "address", "network", "cidr" ]
+
+description = "A library for manipulation of IP (IPv4/IPv6) and MAC address representations"
+
+options(
+  "alert-list": "+test_import_all",
+)
