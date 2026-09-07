@@ -482,7 +482,7 @@ pub struct Ipv4Prefix {
 /// ```
 ///
 pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
-  { addr, prefix_len }
+  { addr, prefix_len, }
 }
 
 ///|
@@ -511,7 +511,7 @@ pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
 /// ```
 ///
 pub fn Ipv4Prefix::new(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
-  { addr, prefix_len }
+  { addr, prefix_len, }
 }
 
 ///|
@@ -1239,21 +1239,21 @@ pub fn Mac::try_from_int(n : Int) -> Mac? {
 }
 
 ///|
-pub impl Show for IpAddrError with output(self, logger) {
+pub impl Show for IpAddrError with fn output(self, logger) {
   logger.write_string(@debug.render(self.to_repr(), max_depth=2147483647))
 }
 
 ///|
-pub impl Show for Ipv4 with output(self, logger) {
+pub impl Show for Ipv4 with fn output(self, logger) {
   logger.write_string(@debug.render(self.to_repr(), max_depth=2147483647))
 }
 
 ///|
-pub impl Show for Ipv4Prefix with output(self, logger) {
+pub impl Show for Ipv4Prefix with fn output(self, logger) {
   logger.write_string(@debug.render(self.to_repr(), max_depth=2147483647))
 }
 
 ///|
-pub impl Show for Mac with output(self, logger) {
+pub impl Show for Mac with fn output(self, logger) {
   logger.write_string(@debug.render(self.to_repr(), max_depth=2147483647))
 }
