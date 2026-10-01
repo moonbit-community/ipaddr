@@ -282,15 +282,12 @@ test "oo_style_constructors" {
     fail("Ipv4::new should produce same result as ipv4")
   }
 
-  // Test Ipv4Prefix::new constructor
+  // Test Ipv4Prefix constructor
   let prefix_old = @ipaddr.ipv4_prefix(@ipaddr.ipv4(192, 168, 1, 0), 24)
-  let prefix_new = @ipaddr.Ipv4Prefix::new(
-    @ipaddr.Ipv4::new(192, 168, 1, 0),
-    24,
-  )
+  let prefix_new = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
   let test_addr = @ipaddr.ipv4(192, 168, 1, 100)
   if prefix_old.contains(test_addr) != prefix_new.contains(test_addr) {
-    fail("Ipv4Prefix::new should produce same result as ipv4_prefix")
+    fail("Ipv4Prefix(...) should produce same result as ipv4_prefix")
   }
 
   // Test Mac::new constructor
@@ -518,25 +515,25 @@ test "try_from_int_functions" {
 ///|
 test "ipv4_prefix_utilities" {
   // Test subnet mask calculation
-  let subnet24 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+  let subnet24 = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
   let mask24 = subnet24.mask()
   if mask24.format() != "255.255.255.0" {
     fail("/24 mask should be 255.255.255.0, got: " + mask24.format())
   }
 
-  let subnet16 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 16)
+  let subnet16 = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(10, 0, 0, 0), 16)
   let mask16 = subnet16.mask()
   if mask16.format() != "255.255.0.0" {
     fail("/16 mask should be 255.255.0.0, got: " + mask16.format())
   }
 
-  let host_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(127, 0, 0, 1), 32)
+  let host_route = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(127, 0, 0, 1), 32)
   let mask32 = host_route.mask()
   if mask32.format() != "255.255.255.255" {
     fail("/32 mask should be 255.255.255.255, got: " + mask32.format())
   }
 
-  let default_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(0, 0, 0, 0), 0)
+  let default_route = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(0, 0, 0, 0), 0)
   let mask0 = default_route.mask()
   if mask0.format() != "0.0.0.0" {
     fail("/0 mask should be 0.0.0.0, got: " + mask0.format())
@@ -558,10 +555,7 @@ test "ipv4_prefix_utilities" {
     fail("/32 should have 1 host, got: " + count32.to_string())
   }
 
-  let point_to_point = @ipaddr.Ipv4Prefix::new(
-    @ipaddr.Ipv4::new(10, 0, 0, 0),
-    31,
-  )
+  let point_to_point = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(10, 0, 0, 0), 31)
   let count31 = point_to_point.host_count()
   if count31 != 2 {
     fail("/31 should have 2 hosts, got: " + count31.to_string())
@@ -662,9 +656,9 @@ test "hash_trait_functionality" {
   }
 
   // Test with prefixes
-  let prefix1 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
-  let prefix2 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
-  let prefix3 = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 25)
+  let prefix1 = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+  let prefix2 = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+  let prefix3 = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(192, 168, 1, 0), 25)
 
   if prefix1 != prefix2 {
     fail("Equal prefixes should be equal")

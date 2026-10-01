@@ -59,6 +59,8 @@ pub struct Ipv4Prefix {
   addr : Ipv4
   prefix_len : Int
 } derive(Compare, Eq, Hash, @debug.Debug)
+#alias(new, deprecated)
+pub fn Ipv4Prefix::Ipv4Prefix(Ipv4, Int) -> Self
 pub fn Ipv4Prefix::broadcast(Self) -> Ipv4
 pub fn Ipv4Prefix::compare(Self, Self) -> Int
 pub fn Ipv4Prefix::contains(Self, Ipv4) -> Bool
@@ -68,7 +70,6 @@ pub fn Ipv4Prefix::hash_combine(Self, Hasher) -> Unit
 pub fn Ipv4Prefix::host_count(Self) -> Int
 pub fn Ipv4Prefix::mask(Self) -> Ipv4
 pub fn Ipv4Prefix::network(Self) -> Ipv4
-pub fn Ipv4Prefix::new(Ipv4, Int) -> Self
 pub fn Ipv4Prefix::not_equal(Self, Self) -> Bool
 pub fn Ipv4Prefix::op_ge(Self, Self) -> Bool
 pub fn Ipv4Prefix::op_gt(Self, Self) -> Bool
