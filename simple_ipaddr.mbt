@@ -501,16 +501,17 @@ pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
 /// # Examples
 /// ```moonbit nocheck
 /// // Create a /24 subnet (255.255.255.0 netmask)
-/// let _ = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+/// let _ = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
 ///
 /// // Create a /16 subnet (255.255.0.0 netmask)
-/// let _ = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 16)
+/// let _ = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(10, 0, 0, 0), 16)
 ///
 /// // Create a /32 host route (255.255.255.255 netmask)
-/// let _ = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(8, 8, 8, 8), 32)
+/// let _ = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(8, 8, 8, 8), 32)
 /// ```
 ///
-pub fn Ipv4Prefix::new(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
+#alias(new, deprecated="Use `Ipv4Prefix(...)` instead")
+pub fn Ipv4Prefix::Ipv4Prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
   { addr, prefix_len, }
 }
 
@@ -697,15 +698,15 @@ pub fn Ipv4Prefix::broadcast(self : Self) -> Ipv4 {
 ///
 /// # Examples
 /// ```moonbit nocheck
-/// let subnet = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+/// let subnet = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
 /// let mask = subnet.mask()
 /// let _ = mask.format() // "255.255.255.0"
 ///
-/// let host_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 1), 32)
+/// let host_route = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(10, 0, 0, 1), 32)
 /// let host_mask = host_route.mask()
 /// let _ = host_mask.format() // "255.255.255.255"
 ///
-/// let default_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(0, 0, 0, 0), 0)
+/// let default_route = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(0, 0, 0, 0), 0)
 /// let default_mask = default_route.mask()
 /// let _ = default_mask.format() // "0.0.0.0"
 /// ```
@@ -729,13 +730,13 @@ pub fn Ipv4Prefix::mask(self : Self) -> Ipv4 {
 ///
 /// # Examples
 /// ```moonbit nocheck
-/// let subnet = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
+/// let subnet = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(192, 168, 1, 0), 24)
 /// let _ = subnet.host_count() // 256 (254 usable)
 ///
-/// let host_route = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 1), 32)
+/// let host_route = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(10, 0, 0, 1), 32)
 /// let _ = host_route.host_count() // 1
 ///
-/// let point_to_point = @ipaddr.Ipv4Prefix::new(@ipaddr.Ipv4::new(10, 0, 0, 0), 31)
+/// let point_to_point = @ipaddr.Ipv4Prefix(@ipaddr.Ipv4::new(10, 0, 0, 0), 31)
 /// let _ = point_to_point.host_count() // 2
 /// ```
 ///
