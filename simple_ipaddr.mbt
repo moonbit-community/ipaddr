@@ -7,7 +7,7 @@
 /// Error types for IP address parsing and validation
 pub enum IpAddrError {
   InvalidFormat
-  InvalidOctet(Int)
+  InvalidOctet(Int32)
 } derive(Eq, Debug, Hash)
 
 ///|
@@ -262,7 +262,7 @@ pub fn Ipv4::is_valid(self : Self) -> Bool {
 /// let _ = zero.to_int() // 0
 /// ```
 ///
-pub fn Ipv4::to_int(self : Self) -> Int {
+pub fn Ipv4::to_int(self : Self) -> Int32 {
   (self.0.to_int() << 24) |
   (self.1.to_int() << 16) |
   (self.2.to_int() << 8) |
@@ -293,7 +293,7 @@ pub fn Ipv4::to_int(self : Self) -> Int {
 /// let _ = @ipaddr.Ipv4::from_int(0) // 0.0.0.0
 /// ```
 ///
-pub fn Ipv4::from_int(n : Int) -> Ipv4 {
+pub fn Ipv4::from_int(n : Int32) -> Ipv4 {
   let a = ((n >> 24) & 0xFF).to_byte()
   let b = ((n >> 16) & 0xFF).to_byte()
   let c = ((n >> 8) & 0xFF).to_byte()
@@ -321,7 +321,7 @@ pub fn Ipv4::from_int(n : Int) -> Ipv4 {
 /// let _ = @ipaddr.Ipv4::try_from_int(-1) // None - negative
 /// ```
 ///
-pub fn Ipv4::try_from_int(n : Int) -> Ipv4? {
+pub fn Ipv4::try_from_int(n : Int32) -> Ipv4? {
   if n < 0 {
     return None
   }
@@ -453,7 +453,7 @@ pub fn Ipv4::is_broadcast(self : Self) -> Bool {
 ///
 pub struct Ipv4Prefix {
   addr : Ipv4
-  prefix_len : Int
+  prefix_len : Int32
 } derive(Eq, Compare, Debug, Hash)
 
 ///|
@@ -481,7 +481,7 @@ pub struct Ipv4Prefix {
 /// let _ = @ipaddr.ipv4_prefix(@ipaddr.ipv4(8, 8, 8, 8), 32)
 /// ```
 ///
-pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
+pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int32) -> Ipv4Prefix {
   { addr, prefix_len, }
 }
 
@@ -511,7 +511,7 @@ pub fn ipv4_prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
 /// ```
 ///
 #alias(new, deprecated="Use `Ipv4Prefix(...)` instead")
-pub fn Ipv4Prefix::Ipv4Prefix(addr : Ipv4, prefix_len : Int) -> Ipv4Prefix {
+pub fn Ipv4Prefix::Ipv4Prefix(addr : Ipv4, prefix_len : Int32) -> Ipv4Prefix {
   { addr, prefix_len, }
 }
 
@@ -553,7 +553,7 @@ pub fn Ipv4Prefix::parse(s : String) -> Ipv4Prefix? {
 }
 
 ///|
-fn parse_prefix_len(s : String) -> Int? {
+fn parse_prefix_len(s : String) -> Int32? {
   if s.length() == 0 || s.length() > 2 {
     return None
   }
@@ -740,7 +740,7 @@ pub fn Ipv4Prefix::mask(self : Self) -> Ipv4 {
 /// let _ = point_to_point.host_count() // 2
 /// ```
 ///
-pub fn Ipv4Prefix::host_count(self : Self) -> Int {
+pub fn Ipv4Prefix::host_count(self : Self) -> Int32 {
   if self.prefix_len >= 32 {
     return 1
   }
@@ -863,7 +863,7 @@ pub fn Mac::parse(s : String) -> Mac? {
     return None
   }
 
-  let bytes : Array[Int] = []
+  let bytes : Array[Int32] = []
   for i = 0; i < 6; i = i + 1 {
     match parse_hex_byte(parts[i].to_owned()) {
       Some(n) => bytes.push(n)
@@ -884,7 +884,7 @@ pub fn Mac::parse(s : String) -> Mac? {
 }
 
 ///|
-fn parse_hex_byte(s : String) -> Int? {
+fn parse_hex_byte(s : String) -> Int32? {
   if s.length() != 2 {
     return None
   }
@@ -928,7 +928,7 @@ fn parse_hex_byte(s : String) -> Int? {
 /// // Internal function examples: "00", "0f", "ff", "ab"
 /// ```
 ///
-fn format_hex8(n : Int) -> String {
+fn format_hex8(n : Int32) -> String {
   let hex_chars = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
   ]
@@ -1141,7 +1141,7 @@ pub fn Mac::is_global(self : Self) -> Bool {
 /// let (_, _, _) = intel_mac.oui() // (0x00, 0x15, 0x17)
 /// ```
 ///
-pub fn Mac::oui(self : Self) -> (Int, Int, Int) {
+pub fn Mac::oui(self : Self) -> (Int32, Int32, Int32) {
   (self.0.to_int(), self.1.to_int(), self.2.to_int())
 }
 
@@ -1167,7 +1167,7 @@ pub fn Mac::oui(self : Self) -> (Int, Int, Int) {
 /// let _ = zero_mac.to_int() // 0 (ignores first two 0xFF bytes)
 /// ```
 ///
-pub fn Mac::to_int(self : Self) -> Int {
+pub fn Mac::to_int(self : Self) -> Int32 {
   (self.2.to_int() << 24) |
   (self.3.to_int() << 16) |
   (self.4.to_int() << 8) |
@@ -1201,7 +1201,7 @@ pub fn Mac::to_int(self : Self) -> Int {
 /// let _ = @ipaddr.Mac::from_int(int_val) // Same as original
 /// ```
 ///
-pub fn Mac::from_int(n : Int) -> Mac {
+pub fn Mac::from_int(n : Int32) -> Mac {
   let b0 = (0).to_byte()
   let b1 = (0).to_byte()
   let b2 = ((n >> 24) & 0xFF).to_byte()
@@ -1231,7 +1231,7 @@ pub fn Mac::from_int(n : Int) -> Mac {
 /// let _ = @ipaddr.Mac::try_from_int(-1) // None - negative
 /// ```
 ///
-pub fn Mac::try_from_int(n : Int) -> Mac? {
+pub fn Mac::try_from_int(n : Int32) -> Mac? {
   // Check for negative values only - MAC addresses use lower 32 bits in our implementation
   if n < 0 {
     return None
